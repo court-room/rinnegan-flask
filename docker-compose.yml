@@ -1,67 +1,15 @@
 version: "3.7"
 
-volumes:
-  rinnegan-data:
-
-networks:
-  backend:
-    driver: bridge
-    name: sentimental-backend
-
-  frontend:
-    driver: bridge
-    name: sentimental-frontend
-
 services:
-  postgre:
-    container_name: postgre
-    image: postgre:development
-    env_file:
-      - ./services/postgre/.env
-    expose:
-      - 5432
-    networks:
-      - backend
-    volumes:
-      - rinnegan-data:/var/lib/postgresql/data/
-    build:
-      context: ./services/postgre/
-      dockerfile: Dockerfile
-
   server:
     container_name: server
     image: server:development
-    depends_on:
-      - postgre
     env_file:
-      - ./services/server/.env
-    networks:
-      - backend
-      - frontend
+      - .env
     ports:
       - 5000:5000
     volumes:
-      - ./services/server:/usr/src/app
-      - ./services/server/logs:/var/log
+      - .:/usr/src/app
     build:
-      context: ./services/server/
-      dockerfile: Dockerfile
-
-  client:
-    container_name: client
-    image: client:development
-    stdin_open: true
-    depends_on:
-      - server
-    environment:
-      - NODE_ENV=development
-      - REACT_APP_SERVER_URL=http://localhost:5000
-    networks:
-      - frontend
-    ports:
-      - 3000:3000
-    volumes:
-      - ./services/client/:/usr/src/builder
-    build:
-      context: ./services/client/
+      context: .
       dockerfile: Dockerfile

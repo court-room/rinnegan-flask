@@ -1,23 +1,9 @@
 # environments
-node_modules/
-env
 .env
-
-# database
-services/postgre/data/
 
 # caches
 __pycache__/
 .pytest_cache/
 
-# logs
-services/server/logs/
-
-# client test coverage
-services/client/coverage
-
-# client
-services/client/package-lock.json
-
-# server
-services/server/Pipfile.lock
+# dependencies
+Pipfile.lock

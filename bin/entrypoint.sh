@@ -19,7 +19,6 @@ create_log_dir() {
     fi
 }
 
-create_log_dir "/var/log/gunicorn"
 create_log_dir "/var/log/server"
 
 if [ $STAGE != "local" ]; then

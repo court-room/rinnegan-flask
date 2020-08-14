@@ -1,38 +1,32 @@
-# rinnegan
-
-- Staging [![staging](https://gitlab.com/onlinejudge95/rinnegan/badges/staging/pipeline.svg)](https://gitlab.com/onlinejudge95/rinnegan/commits/staging)
-- Production [![staging](https://gitlab.com/onlinejudge95/rinnegan/badges/master/pipeline.svg)](https://gitlab.com/onlinejudge95/rinnegan/commits/master)
+# rinnegan-server
 
 ## About
 
-In compact form, rinnegan is sentiments as a service for an end user.
-In today's world where **Sensationalism** is at an all time peak, it's really important for a user to know
-what a collective group of people think about a particular _item/idea_.
+We are currently using `python:3.8.2-alpine` image from dockerhub for the database.
+The current image size for server is `367MB` and is tagged as `server:development`
 
-Rinnegan tries to bridge the gap by providing a solution where a user can come and and search for sentiment of a keyword,
-in a given timef rame from a limited sets of platforms.
+Server for rinnegan is written in `Flask` using `Flask-RESTX` as swagger support.
+We currently have a single pipeline involving following stages
 
-## Architecture
-
-The production system is hosted on heroku, we use containers for building and deploying the app.
-Here is how our current architecture is.
-![Architecture](assets/rinnegan.png)
-
-## Development
-
-1. Fork the repo.
-2. Perform your changes.
-3. Raise a PR for the same.
-4. For contributions please lookout for [CONTRIBUTING](.github/CONTRIBUTING.md)
+1. **build** the docker image is build
+2. **test** the build image is used to run the tests
+3. **deploy** the tested image is pushed to heroku container registry for deployment
 
 ## Setup
 
-Clone the repo using the following commands
-
-```bash
-$ git clone git@github.com:onlinejudge95/rinnegan.git
-```
+1. Create a file named `/services/server/.env` using `/services/server/.env.example` as a template.
+2. Edit your database url string for development and test environment by using the values derived in `/services/db/.env` [file](../db/README.md#Setup)
+3. In the `docker-compose.yml` add the following volume mount `./services/server:/usr/src/app` to support hot reloading.
+4. To start the container run the following command
+   ```bash
+   $ docker-compose up --build --detach
+   ```
+   This will bring your database and the server up and running
+5. The volume mount for storing data is owned by the root user so if you are running docker as a non-root user in your system,
+   you can use the script provided at `/bin/orchestrate_container.sh`
+6. Once the DB is up and running you need to run the script `/bin/sync_database.sh` to bring the database to current schema.
+7. To run the tests use the following script `/bin/test_server.sh`
 
 ## Contact-Us
 
-- [onlinejudge95](mailto:onlinejudge95@gmail.com)
+[onlinejudge95](mailto:onlinejudge95@gmail.com)

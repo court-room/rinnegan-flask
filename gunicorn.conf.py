@@ -142,7 +142,7 @@ Logging
         A string of "debug", "info", "warning", "error", "critical"
 """
 
-logconfig = "/usr/src/app/gunicorn.log.conf"
+logfile = "-"
 capture_output = True
 
 """

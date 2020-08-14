@@ -32,6 +32,6 @@ RUN pip install --no-cache-dir /wheels/*
 
 COPY . .
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x bin/entrypoint.sh
 
-CMD [ "./entrypoint.sh" ]
+CMD [ "./bin/entrypoint.sh" ]
