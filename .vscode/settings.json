@@ -1,11 +1,7 @@
 {
   "files.autoSave": "off",
   "files.insertFinalNewline": true,
-  "python.formatting.blackPath": "~/.local/share/virtualenvs/rinnegan-ECfdKk8p/bin/black",
-  "python.formatting.blackArgs": [
-    "--config",
-    "./services/server/pyproject.toml",
-    "."
-  ],
+  "python.formatting.blackPath": "~/.local/share/virtualenvsrinnegan-backend-wcLWuioY/bin/black",
+  "python.formatting.blackArgs": ["--config", "pyproject.toml", "."],
   "python.formatting.provider": "black"
 }

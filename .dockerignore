@@ -1,9 +1,16 @@
-__pycache__/
-.pytest_cache/
-logs/
+.git/
+.github/
+.vscode/
 
-.env
+_config.yml
+.deepsource.toml
+.dockerignore
 .env.example
-README.md
+.gitignore
+.pep8speaks.yml
+docker-compose.yml
 Dockerfile
-Pipfile.lock
+LICENSE
+pyproject.toml
+README.MD
+setup.cfg
