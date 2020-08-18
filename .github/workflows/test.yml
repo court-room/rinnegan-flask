@@ -70,7 +70,7 @@ jobs:
           DATABASE_URL: DUMMY_DATABASE_URL
           DATABASE_TEST_URL: DUMMY_DATABASE_TEST_URL
         run: |
-          pytest -c app/tests/pytest.ini
+          pytest -c tests/pytest.ini
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
