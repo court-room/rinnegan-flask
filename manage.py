@@ -2,7 +2,6 @@ import logging
 import logging.config
 import os
 
-import coloredlogs
 import yaml
 
 from app import create_app
@@ -20,7 +19,6 @@ def setup_logging():
         with open("/usr/src/app/logging.yml", "r") as fp:
             config_dict = yaml.safe_load(fp.read())
             logging.config.dictConfig(config_dict)
-            coloredlogs.install()
     except yaml.constructor.ConstructorError as e:
         print(e)
         print("YML file for configuring the logger is invalid")

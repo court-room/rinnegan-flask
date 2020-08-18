@@ -5,44 +5,21 @@ disable_existing_loggers: true
 root:
   level: INFO
   handlers:
-    - access_handler
-    - error_handler
+    - stream_handler
 
 loggers:
-  server.access:
+  server:
     level: DEBUG
     handlers:
-      - access_handler
+      - stream_handler
     propagate: no
 
-  server.error:
-    level: ERROR
-    handlers:
-      - error_handler
-    propagate: yes
-
 handlers:
-  access_handler:
-    class: logging.handlers.TimedRotatingFileHandler
-    formatter: access_formatter
-    filename: /var/log/server/access/server.log
-    when: D
-    backupCount: 1
-    encoding: utf8
-    utc: True
-
-  error_handler:
-    class: logging.handlers.TimedRotatingFileHandler
-    formatter: error_formatter
-    filename: /var/log/server/error/server.log
-    when: D
-    backupCount: 1
-    encoding: utf8
-    utc: True
+  stream_handler:
+    class: logging.StreamHandler
+    formatter: stream_formatter
+    stream: ext://sys.stdout
 
 formatters:
-  access_formatter:
-    format: "<%(asctime)s><Process ID- %(process)d><%(pathname)s><%(levelname)s><%(message)s>"
-
-  error_formatter:
-    format: "<%(asctime)s><Process ID- %(process)d><%(levelname)s><%(pathname)s><%(funcName)s><%(lineno)d>%(message)s"
+  stream_formatter:
+    format: "%(asctime)s PID- %(process)d %(levelname)s %(pathname)s %(funcName)s %(lineno)d %(message)s"
