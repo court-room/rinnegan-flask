@@ -7,6 +7,9 @@ def test_passwords_hashed_randomly(test_app, test_database, add_user):
         "test_user_two", "test_user_two@mail.com", "test_password"
     )
 
-    assert user_one.password != user_two.password
-    assert user_one.password != "test_password"
-    assert user_two.password != "test_password"
+    if user_one.password == user_two.password:
+        raise AssertionError
+    if user_one.password == "test_password":
+        raise AssertionError
+    if user_two.password == "test_password":
+        raise AssertionError

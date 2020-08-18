@@ -19,11 +19,14 @@ def test_add_user(test_app, test_database):
         },
     )
 
-    assert response.status_code == 201
+    if response.status_code != 201:
+        raise AssertionError
 
     data = response.get_json()
-    assert "id" in data.keys()
-    assert "test_user@email.com" in data["message"]
+    if "id" not in data.keys():
+        raise AssertionError
+    if "test_user@email.com" not in data["message"]:
+        raise AssertionError
 
 
 # Test user creation fails due to empty data
@@ -38,10 +41,12 @@ def test_add_user_empty_data(test_app, test_database):
         },
     )
 
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test user creation fails due to invalid data
@@ -56,10 +61,12 @@ def test_add_user_invalid_data(test_app, test_database):
         },
     )
 
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test user creation fails due to duplicate entry
@@ -93,10 +100,12 @@ def test_add_user_duplicate_email(test_app, test_database):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "test_user@mail.com is already registered" in data["message"]
+    if "test_user@mail.com is already registered" not in data["message"]:
+        raise AssertionError
 
 
 # Test user creation fails due to invalid content-type header
@@ -107,20 +116,24 @@ def test_add_user_invalid_header(test_app, test_database):
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Accept": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "define Content-Type header" in data["message"]
+    if "define Content-Type header" not in data["message"]:
+        raise AssertionError
 
     response = client.post(
         "/users",
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Content-Type": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "supported is application/json" in data["message"]
+    if "supported is application/json" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching user list passes
@@ -163,18 +176,26 @@ def test_get_users(test_app, test_database, add_user):
         },
     )
 
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
 
-    assert len(data) == 2
-    assert "test_user_one" in data[0]["username"]
-    assert "test_user_one@mail.com" in data[0]["email"]
-    assert "password" not in data[0]
+    if len(data) != 2:
+        raise AssertionError
+    if "test_user_one" not in data[0]["username"]:
+        raise AssertionError
+    if "test_user_one@mail.com" not in data[0]["email"]:
+        raise AssertionError
+    if "password" in data[0]:
+        raise AssertionError
 
-    assert "test_user_two" in data[1]["username"]
-    assert "test_user_two@mail.com" in data[1]["email"]
-    assert "password" not in data[1]
+    if "test_user_two" not in data[1]["username"]:
+        raise AssertionError
+    if "test_user_two@mail.com" not in data[1]["email"]:
+        raise AssertionError
+    if "password" in data[1]:
+        raise AssertionError
 
 
 # Test fetching user list fails due to missing token
@@ -193,10 +214,12 @@ def test_get_users_missing_token(test_app, test_database, add_user):
     client = test_app.test_client()
 
     response = client.get("/users", headers={"Accept": "application/json"})
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching user list fails due to expired token
@@ -239,10 +262,12 @@ def test_get_users_expired_token(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching user list fails due to invalid token
@@ -267,10 +292,12 @@ def test_get_users_invalid_token(test_app, test_database, add_user):
             "Authorization": "Bearer invalid_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single user passes
@@ -298,13 +325,18 @@ def test_single_user(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
-    assert data["id"] == user.id
-    assert data["username"] == "test_user"
-    assert data["email"] == "test_user@mail.com"
-    assert "password" not in data.keys()
+    if data["id"] != user.id:
+        raise AssertionError
+    if data["username"] != "test_user":
+        raise AssertionError
+    if data["email"] != "test_user@mail.com":
+        raise AssertionError
+    if "password" in data.keys():
+        raise AssertionError
 
 
 # Test fetching single user fails due to incorrect id
@@ -336,10 +368,12 @@ def test_single_user_invalid_id(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single user fails due to missing token
@@ -351,10 +385,12 @@ def test_single_user_missing_token(test_app, test_database, add_user):
         f"/users/{user.id}", headers={"Accept": "application/json"}
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single user fails due to expired token
@@ -392,10 +428,12 @@ def test_single_user_expired_token(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single user fails due to invalid token
@@ -415,10 +453,12 @@ def test_single_user_invalid_token(test_app, test_database, add_user):
             "Authorization": "Bearer invalid_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a user passes
@@ -450,7 +490,8 @@ def test_remove_user(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 204
+    if response.status_code != 204:
+        raise AssertionError
 
 
 # Test removing a user fails due to invalid id
@@ -482,10 +523,12 @@ def test_remove_user_invalid_id(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a user fails due to missing token
@@ -497,10 +540,12 @@ def test_remove_user_missing_token(test_app, test_database, add_user):
         f"/users/{user.id}", headers={"Accept": "application/json"}
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a user fails due to expired token
@@ -538,10 +583,12 @@ def test_remove_user_expired_token(test_app, test_database, add_user):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a user fails due to invalid token
@@ -561,10 +608,12 @@ def test_remove_user_invalid_token(test_app, test_database, add_user):
             "Authorization": "Bearer invalid_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user passes
@@ -605,12 +654,16 @@ def test_update_user(test_app, test_database, add_user):
         },
     )
 
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
-    assert data["id"] == 1, data
-    assert data["username"] == "test_user_update"
-    assert data["email"] == "test_user_update@mail.com"
+    if data["id"] != 1:
+        raise AssertionError(data)
+    if data["username"] != "test_user_update":
+        raise AssertionError
+    if data["email"] != "test_user_update@mail.com":
+        raise AssertionError
 
 
 # Test update a user fails due to empty data
@@ -628,10 +681,12 @@ def test_update_user_empty_data(test_app, test_database, add_user):
         },
     )
 
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user fails due to invalid id
@@ -672,10 +727,12 @@ def test_update_user_invalid_id(test_app, test_database, add_user):
         },
     )
 
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user fails due to invalid headers
@@ -688,20 +745,24 @@ def test_update_user_invalid_headers(test_app, test_database, add_user):
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Accept": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "define Content-Type header" in data["message"]
+    if "define Content-Type header" not in data["message"]:
+        raise AssertionError
 
     response = client.post(
         "/users",
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Content-Type": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "supported is application/json" in data["message"]
+    if "supported is application/json" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user fails due to missing token
@@ -723,10 +784,12 @@ def test_update_user_missing_token(test_app, test_database, add_user):
         },
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user fails due to expired token
@@ -771,10 +834,12 @@ def test_update_user_expired_token(test_app, test_database, add_user):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a user fails due to invalid token
@@ -801,7 +866,9 @@ def test_update_user_invalid_token(test_app, test_database, add_user):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError

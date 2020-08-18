@@ -18,11 +18,14 @@ def test_add_sentiment(test_app, test_database, add_user):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 201
+    if response.status_code != 201:
+        raise AssertionError
 
     data = response.get_json()
-    assert "id" in data.keys()
-    assert "test_keyword" in data["message"]
+    if "id" not in data.keys():
+        raise AssertionError
+    if "test_keyword" not in data["message"]:
+        raise AssertionError
 
 
 # Test sentiment creation fails due to empty data
@@ -36,10 +39,12 @@ def test_add_sentiment_empty_data(test_app, test_database):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test sentiment creation fails due to invalid data
@@ -53,10 +58,12 @@ def test_add_sentiment_invalid_data(test_app, test_database):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test sentiment creation fails due to unregistered user
@@ -70,10 +77,12 @@ def test_add_sentiment_unregistered_user(test_app, test_database):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "user is not registered" in data["message"], data
+    if "user is not registered" not in data["message"]:
+        raise AssertionError(data)
 
 
 # Test sentiment creation fails due to exceeding quota
@@ -94,10 +103,12 @@ def test_add_sentiment_exceeding_quota(test_app, test_database, add_user):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "exhausted the quota for keywords" in data["message"], data
+    if "exhausted the quota for keywords" not in data["message"]:
+        raise AssertionError(data)
 
 
 # Test user creation fails due to invalid content-type header
@@ -108,20 +119,24 @@ def test_add_user_invalid_header(test_app):
         data=json.dumps({"user_id": 1}),
         headers={"Accept": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "define Content-Type header" in data["message"]
+    if "define Content-Type header" not in data["message"]:
+        raise AssertionError
 
     response = client.post(
         "/users",
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Content-Type": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "supported is application/json" in data["message"]
+    if "supported is application/json" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching sentiment list passes
@@ -146,16 +161,22 @@ def test_get_sentiments(
         },
     )
 
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
 
-    assert len(data) == 2
-    assert user.id == data[0]["user_id"]
-    assert "test_keyword_one" in data[0]["keyword"]
+    if len(data) != 2:
+        raise AssertionError
+    if user.id != data[0]["user_id"]:
+        raise AssertionError
+    if "test_keyword_one" not in data[0]["keyword"]:
+        raise AssertionError
 
-    assert user.id == data[1]["user_id"]
-    assert "test_keyword_two" in data[1]["keyword"]
+    if user.id != data[1]["user_id"]:
+        raise AssertionError
+    if "test_keyword_two" not in data[1]["keyword"]:
+        raise AssertionError
 
 
 # Test fetching sentiment list fails due to missing token
@@ -163,10 +184,12 @@ def test_get_sentiments_missing_token(test_app, test_database):
     client = test_app.test_client()
 
     response = client.get("/sentiment", headers={"Accept": "application/json"})
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching sentiment list fails due to expired token
@@ -194,10 +217,12 @@ def test_get_sentiments_expired_token(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching sentiment list fails due to invalid token
@@ -210,10 +235,12 @@ def test_get_sentiments_invalid_token(test_app, test_database):
             "Authorization": "Bearer access_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single sentiment passes
@@ -237,12 +264,16 @@ def test_single_sentiment(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
-    assert data["id"] == sentiment.id
-    assert data["user_id"] == user.id
-    assert data["keyword"] == sentiment.keyword
+    if data["id"] != sentiment.id:
+        raise AssertionError
+    if data["user_id"] != user.id:
+        raise AssertionError
+    if data["keyword"] != sentiment.keyword:
+        raise AssertionError
 
 
 # Test fetching single sentiment fails due to incorrect id
@@ -265,10 +296,12 @@ def test_single_sentiment_invalid_id(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single sentiment fails due to missing token
@@ -279,10 +312,12 @@ def test_single_sentiment_missing_token(test_app):
         "/sentiment/1", headers={"Accept": "application/json"}
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single sentiment fails due to expired token
@@ -308,10 +343,12 @@ def test_single_sentiment_expired_token(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test fetching single sentiment fails due to invalid token
@@ -325,10 +362,12 @@ def test_single_sentiment_invalid_token(test_app, test_database):
             "Authorization": "Bearer access_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a sentiment passes
@@ -352,7 +391,8 @@ def test_remove_sentiment(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 204
+    if response.status_code != 204:
+        raise AssertionError
 
 
 # Test removing a sentiment fails due to invalid id
@@ -375,10 +415,12 @@ def test_remove_sentiment_invalid_id(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a sentiment fails due to missing token
@@ -389,10 +431,12 @@ def test_remove_sentiment_missing_token(test_app):
         "/sentiment/1", headers={"Accept": "application/json"}
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a sentiment fails due to expired token
@@ -418,10 +462,12 @@ def test_remove_sentiment_expired_token(
             "Authorization": f"Bearer {tokens.access_token}",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test removing a sentiment fails due to invalid token
@@ -435,10 +481,12 @@ def test_remove_sentiment_invalid_token(test_app, test_database):
             "Authorization": "Bearer access_token",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment passes
@@ -466,12 +514,16 @@ def test_update_sentiment(
         },
     )
 
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise AssertionError
 
     data = response.get_json()
-    assert data["id"] == sentiment.id
-    assert data["user_id"] == user.id
-    assert data["keyword"] == "test_sentiment_update"
+    if data["id"] != sentiment.id:
+        raise AssertionError
+    if data["user_id"] != user.id:
+        raise AssertionError
+    if data["keyword"] != "test_sentiment_update":
+        raise AssertionError
 
 
 # Test update a sentiment fails due to empty data
@@ -499,10 +551,12 @@ def test_update_sentiment_empty_data(
         },
     )
 
-    assert response.status_code == 400
+    if response.status_code != 400:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Input payload validation failed" in data["message"]
+    if "Input payload validation failed" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment fails due to invalid id
@@ -528,10 +582,12 @@ def test_update_sentiment_invalid_id(
         },
     )
 
-    assert response.status_code == 404
+    if response.status_code != 404:
+        raise AssertionError
 
     data = response.get_json()
-    assert "does not exist" in data["message"]
+    if "does not exist" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment fails due to invalid headers
@@ -542,20 +598,24 @@ def test_update_sentiment_invalid_headers(test_app):
         data=json.dumps({"keyword": "test_sentiment_update"}),
         headers={"Accept": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "define Content-Type header" in data["message"]
+    if "define Content-Type header" not in data["message"]:
+        raise AssertionError
 
     response = client.put(
         "/sentiment/1",
         data=json.dumps({"keyword": "test_sentiment_update"}),
         headers={"Content-Type": "application/json"},
     )
-    assert response.status_code == 415
+    if response.status_code != 415:
+        raise AssertionError
 
     data = response.get_json()
-    assert "supported is application/json" in data["message"]
+    if "supported is application/json" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment fails due to missing token
@@ -571,10 +631,12 @@ def test_update_sentiment_missing_token(test_app):
         },
     )
 
-    assert response.status_code == 403
+    if response.status_code != 403:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token required" in data["message"]
+    if "Token required" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment fails due to expired token
@@ -602,10 +664,12 @@ def test_update_sentiment_expired_token(
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Token expired" in data["message"]
+    if "Token expired" not in data["message"]:
+        raise AssertionError
 
 
 # Test update a sentiment fails due to invalid token
@@ -621,7 +685,9 @@ def test_update_sentiment_invalid_token(test_app):
             "Content-Type": "application/json",
         },
     )
-    assert response.status_code == 401
+    if response.status_code != 401:
+        raise AssertionError
 
     data = response.get_json()
-    assert "Invalid token" in data["message"]
+    if "Invalid token" not in data["message"]:
+        raise AssertionError
