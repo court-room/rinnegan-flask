@@ -1,8 +1,17 @@
 import json
 
+from app.api.auth import views
+from tests import mock_objects
+
 
 # Test user registration passes
-def test_user_registration(test_app, test_database):
+def test_user_registration(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+    )
+
+    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
+
     client = test_app.test_client()
 
     response = client.post(
@@ -29,7 +38,7 @@ def test_user_registration(test_app, test_database):
 
 
 # Test user registration fails due to empty data
-def test_user_registration_empty_data(test_app, test_database):
+def test_user_registration_empty_data(test_app):
     client = test_app.test_client()
 
     response = client.post(
@@ -47,7 +56,7 @@ def test_user_registration_empty_data(test_app, test_database):
 
 
 # Test user registration fails due to invalid data
-def test_user_registration_invalid_data(test_app, test_database):
+def test_user_registration_invalid_data(test_app):
     client = test_app.test_client()
 
     response = client.post(
@@ -65,8 +74,12 @@ def test_user_registration_invalid_data(test_app, test_database):
 
 
 # Test user registration fails due to duplicate entry
-def test_user_registration_duplicate_entry(test_app, test_database, add_user):
-    add_user("test_user", "test_user@mail.com", "test_password")
+def test_user_registration_duplicate_entry(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_email", mock_objects.get_user_by_email
+    )
+
+    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
 
     client = test_app.test_client()
 
@@ -75,7 +88,7 @@ def test_user_registration_duplicate_entry(test_app, test_database, add_user):
         data=json.dumps(
             {
                 "username": "test_user",
-                "email": "test_user@mail.com",
+                "email": "test_user@email.com",
                 "password": "test_password",
             }
         ),
@@ -87,11 +100,11 @@ def test_user_registration_duplicate_entry(test_app, test_database, add_user):
     assert response.status_code == 400
 
     data = response.get_json()
-    assert "test_user@mail.com is already registered" in data["message"]
+    assert "test_user@email.com is already registered" in data["message"]
 
 
 # Test user registration fails due to invalid headers
-def test_user_registration_invalid_header(test_app, test_database):
+def test_user_registration_invalid_header(test_app):
     client = test_app.test_client()
     response = client.post(
         "/auth/register",
@@ -115,8 +128,15 @@ def test_user_registration_invalid_header(test_app, test_database):
 
 
 # Test user login passes
-def test_user_login(test_app, test_database, add_user):
-    add_user("test_user", "test_user@mail.com", "test_password")
+def test_user_login(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_email", mock_objects.get_user_object_by_email,
+    )
+    monkeypatch.setattr(views, "add_token", mock_objects.add_token)
+    monkeypatch.setattr(
+        views, "password_matches", mock_objects.password_matches
+    )
+
     client = test_app.test_client()
     response = client.post(
         "/auth/login",
@@ -137,13 +157,18 @@ def test_user_login(test_app, test_database, add_user):
 
 
 # Test user login fails due to wrong password
-def test_user_login_wrong_password(test_app, test_database, add_user):
-    add_user("test_user", "test_user@mail.com", "test_password")
+def test_user_login_wrong_password(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_email", mock_objects.get_user_by_email,
+    )
+    monkeypatch.setattr(
+        views, "password_matches", mock_objects.password_not_matches
+    )
     client = test_app.test_client()
     response = client.post(
         "/auth/login",
         data=json.dumps(
-            {"email": "test_user@mail.com", "password": "test_password_wrong"}
+            {"email": "test_user@mail.com", "password": "test_password"}
         ),
         headers={
             "Accept": "application/json",
@@ -158,7 +183,10 @@ def test_user_login_wrong_password(test_app, test_database, add_user):
 
 
 # Test user login fails due to unregistered user
-def test_user_login_unregistered_user(test_app, test_database):
+def test_user_login_unregistered_user(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+    )
     client = test_app.test_client()
     response = client.post(
         "/auth/login",
@@ -178,7 +206,7 @@ def test_user_login_unregistered_user(test_app, test_database):
 
 
 # Test user login fails due to invalid header
-def test_user_login_invalid_header(test_app, test_database):
+def test_user_login_invalid_header(test_app):
     client = test_app.test_client()
     response = client.post(
         "/auth/login",
@@ -202,26 +230,16 @@ def test_user_login_invalid_header(test_app, test_database):
 
 
 # Test refresh token passes
-def test_refresh_token(test_app, test_database, add_user):
-    add_user("test_user", "test_user@mail.com", "test_password")
+def test_refresh_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+    )
+    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
 
     client = test_app.test_client()
     response = client.post(
-        "/auth/login",
-        data=json.dumps(
-            {"email": "test_user@mail.com", "password": "test_password"}
-        ),
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        },
-    )
-    data = response.get_json()
-    refresh_token = data["refresh_token"]
-
-    response = client.post(
         "/auth/refresh",
-        data=json.dumps({"refresh_token": refresh_token}),
+        data=json.dumps({"refresh_token": "refresh_token"}),
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -235,27 +253,18 @@ def test_refresh_token(test_app, test_database, add_user):
 
 
 # Test refresh token fails due to expired token
-def test_refresh_token_expired(test_app, test_database, add_user):
-    add_user("test_user", "test_user@mail.com", "test_password")
-    test_app.config["REFRESH_TOKEN_EXPIRATION"] = -1
+def test_refresh_token_expired(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_expired_token_exception,
+    )
+    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
 
     client = test_app.test_client()
     response = client.post(
-        "/auth/login",
-        data=json.dumps(
-            {"email": "test_user@mail.com", "password": "test_password"}
-        ),
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        },
-    )
-    data = response.get_json()
-    refresh_token = data["refresh_token"]
-
-    response = client.post(
         "/auth/refresh",
-        data=json.dumps({"refresh_token": refresh_token}),
+        data=json.dumps({"refresh_token": "refresh_token"}),
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -268,11 +277,18 @@ def test_refresh_token_expired(test_app, test_database, add_user):
 
 
 # Test refresh token fails due to invalid token
-def test_refresh_token_invalid(test_app, test_database):
+def test_refresh_token_invalid(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_invalid_token_exception,
+    )
+    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
+
     client = test_app.test_client()
     response = client.post(
         "/auth/refresh",
-        data=json.dumps({"refresh_token": "invalid_token"}),
+        data=json.dumps({"refresh_token": "refresh_token"}),
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",

@@ -1,12 +1,17 @@
 import json
 
+from app.api.sentiment import views
+from tests import mock_objects
+
 
 # Test sentiment creation passes
-def test_add_sentiment(test_app, test_database, add_user):
-    add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_add_sentiment(test_app, monkeypatch):
+    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "add_sentiment", mock_objects.add_sentiment)
+    monkeypatch.setattr(
+        views,
+        "is_user_sentiment_quota_exhausted",
+        mock_objects.user_sentiment_quota_not_exhausted,
     )
 
     client = test_app.test_client()
@@ -26,7 +31,10 @@ def test_add_sentiment(test_app, test_database, add_user):
 
 
 # Test sentiment creation fails due to empty data
-def test_add_sentiment_empty_data(test_app, test_database):
+def test_add_sentiment_empty_data(test_app, monkeypatch):
+    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "add_sentiment", mock_objects.add_sentiment)
+
     client = test_app.test_client()
     response = client.post(
         "/sentiment",
@@ -43,7 +51,10 @@ def test_add_sentiment_empty_data(test_app, test_database):
 
 
 # Test sentiment creation fails due to invalid data
-def test_add_sentiment_invalid_data(test_app, test_database):
+def test_add_sentiment_invalid_data(test_app, monkeypatch):
+    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "add_sentiment", mock_objects.add_sentiment)
+
     client = test_app.test_client()
     response = client.post(
         "/sentiment",
@@ -60,7 +71,12 @@ def test_add_sentiment_invalid_data(test_app, test_database):
 
 
 # Test sentiment creation fails due to unregistered user
-def test_add_sentiment_unregistered_user(test_app, test_database):
+def test_add_sentiment_unregistered_user(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_by_id", mock_objects.get_no_user_by_id
+    )
+    monkeypatch.setattr(views, "add_sentiment", mock_objects.add_sentiment)
+
     client = test_app.test_client()
     response = client.post(
         "/sentiment",
@@ -77,13 +93,14 @@ def test_add_sentiment_unregistered_user(test_app, test_database):
 
 
 # Test sentiment creation fails due to exceeding quota
-def test_add_sentiment_exceeding_quota(test_app, test_database, add_user):
-    add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_add_sentiment_exceeding_quota(test_app, monkeypatch):
+    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(
+        views,
+        "is_user_sentiment_quota_exhausted",
+        mock_objects.user_sentiment_quota_exhausted,
     )
-    test_app.config["SENTIMENT_QUOTA_LIMIT"] = 6
+    monkeypatch.setattr(views, "add_sentiment", mock_objects.add_sentiment)
 
     client = test_app.test_client()
     response = client.post(
@@ -100,8 +117,8 @@ def test_add_sentiment_exceeding_quota(test_app, test_database, add_user):
     assert "exhausted the quota for keywords" in data["message"], data
 
 
-# Test user creation fails due to invalid content-type header
-def test_add_user_invalid_header(test_app):
+# Test sentiment creation fails due to invalid content-type header
+def test_add_sentiment_invalid_header(test_app):
     client = test_app.test_client()
     response = client.post(
         "/sentiment",
@@ -114,7 +131,7 @@ def test_add_user_invalid_header(test_app):
     assert "define Content-Type header" in data["message"]
 
     response = client.post(
-        "/users",
+        "/sentiment",
         data=json.dumps({"email": "test_user@email.com"}),
         headers={"Content-Type": "application/json"},
     )
@@ -125,24 +142,20 @@ def test_add_user_invalid_header(test_app):
 
 
 # Test fetching sentiment list passes
-def test_get_sentiments(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_get_sentiments(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
-    tokens = login_user(user.id)
-    add_sentiments(user_id=user.id, keyword="test_keyword_one")
-    add_sentiments(user_id=user.id, keyword="test_keyword_two")
+    monkeypatch.setattr(
+        views, "get_all_sentiments", mock_objects.get_all_sentiments
+    )
 
     client = test_app.test_client()
     response = client.get(
         "/sentiment",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
         },
     )
 
@@ -151,15 +164,15 @@ def test_get_sentiments(
     data = response.get_json()
 
     assert len(data) == 2
-    assert user.id == data[0]["user_id"]
+    assert 1 == data[0]["user_id"]
     assert "test_keyword_one" in data[0]["keyword"]
 
-    assert user.id == data[1]["user_id"]
+    assert 1 == data[1]["user_id"]
     assert "test_keyword_two" in data[1]["keyword"]
 
 
 # Test fetching sentiment list fails due to missing token
-def test_get_sentiments_missing_token(test_app, test_database):
+def test_get_sentiments_missing_token(test_app):
     client = test_app.test_client()
 
     response = client.get("/sentiment", headers={"Accept": "application/json"})
@@ -170,20 +183,12 @@ def test_get_sentiments_missing_token(test_app, test_database):
 
 
 # Test fetching sentiment list fails due to expired token
-def test_get_sentiments_expired_token(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_get_sentiments_expired_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_expired_token_exception,
     )
-
-    test_app.config["ACCESS_TOKEN_EXPIRATION"] = -1
-
-    tokens = login_user(user.id)
-    add_sentiments(user_id=user.id, keyword="test_keyword_one")
-    add_sentiments(user_id=user.id, keyword="test_keyword_two")
 
     client = test_app.test_client()
 
@@ -191,7 +196,7 @@ def test_get_sentiments_expired_token(
         "/sentiment",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
         },
     )
     assert response.status_code == 401
@@ -201,8 +206,14 @@ def test_get_sentiments_expired_token(
 
 
 # Test fetching sentiment list fails due to invalid token
-def test_get_sentiments_invalid_token(test_app, test_database):
+def test_get_sentiments_invalid_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_invalid_token_exception,
+    )
     client = test_app.test_client()
+
     response = client.get(
         "/sentiment",
         headers={
@@ -217,44 +228,14 @@ def test_get_sentiments_invalid_token(test_app, test_database):
 
 
 # Test fetching single sentiment passes
-def test_single_sentiment(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_single_sentiment(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
-    tokens = login_user(user.id)
-    sentiment = add_sentiments(user_id=user.id, keyword="test_keyword_one")
 
-    client = test_app.test_client()
-
-    response = client.get(
-        f"/sentiment/{sentiment.id}",
-        headers={
-            "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
-        },
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
     )
-    assert response.status_code == 200
-
-    data = response.get_json()
-    assert data["id"] == sentiment.id
-    assert data["user_id"] == user.id
-    assert data["keyword"] == sentiment.keyword
-
-
-# Test fetching single sentiment fails due to incorrect id
-def test_single_sentiment_invalid_id(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
-    )
-    tokens = login_user(user.id)
 
     client = test_app.test_client()
 
@@ -262,7 +243,34 @@ def test_single_sentiment_invalid_id(
         "/sentiment/1",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
+        },
+    )
+    assert response.status_code == 200
+
+    data = response.get_json()
+    assert data["id"] == 1
+    assert data["user_id"] == 1
+    assert data["keyword"] == "test_keyword_one"
+
+
+# Test fetching single sentiment fails due to incorrect id
+def test_single_sentiment_invalid_id(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_no_sentiment_by_id
+    )
+
+    client = test_app.test_client()
+
+    response = client.get(
+        "/sentiment/1",
+        headers={
+            "Accept": "application/json",
+            "Authorization": "Bearer access_token",
         },
     )
     assert response.status_code == 404
@@ -286,18 +294,16 @@ def test_single_sentiment_missing_token(test_app):
 
 
 # Test fetching single sentiment fails due to expired token
-def test_single_sentiment_expired_token(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_single_sentiment_expired_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_expired_token_exception,
     )
 
-    test_app.config["ACCESS_TOKEN_EXPIRATION"] = -1
-
-    tokens = login_user(user.id)
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_expired_token_exception
+    )
 
     client = test_app.test_client()
 
@@ -305,7 +311,7 @@ def test_single_sentiment_expired_token(
         "/sentiment/1",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
         },
     )
     assert response.status_code == 401
@@ -315,7 +321,17 @@ def test_single_sentiment_expired_token(
 
 
 # Test fetching single sentiment fails due to invalid token
-def test_single_sentiment_invalid_token(test_app, test_database):
+def test_single_sentiment_invalid_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_invalid_token_exception,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_invalid_token_exception
+    )
+
     client = test_app.test_client()
 
     response = client.get(
@@ -332,39 +348,17 @@ def test_single_sentiment_invalid_token(test_app, test_database):
 
 
 # Test removing a sentiment passes
-def test_remove_sentiment(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_remove_sentiment(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
-    tokens = login_user(user.id)
-    sentiment = add_sentiments(user_id=user.id, keyword="test_keyword_one")
 
-    client = test_app.test_client()
-
-    response = client.delete(
-        f"/sentiment/{sentiment.id}",
-        headers={
-            "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
-        },
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
     )
-    assert response.status_code == 204
-
-
-# Test removing a sentiment fails due to invalid id
-def test_remove_sentiment_invalid_id(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+    monkeypatch.setattr(
+        views, "remove_sentiment", mock_objects.remove_sentiment
     )
-    tokens = login_user(user.id)
 
     client = test_app.test_client()
 
@@ -372,7 +366,29 @@ def test_remove_sentiment_invalid_id(
         "/sentiment/1",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
+        },
+    )
+    assert response.status_code == 204
+
+
+# Test removing a sentiment fails due to incorrect id
+def test_remove_sentiment_invalid_id(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_no_sentiment_by_id
+    )
+
+    client = test_app.test_client()
+
+    response = client.delete(
+        "/sentiment/1",
+        headers={
+            "Accept": "application/json",
+            "Authorization": "Bearer access_token",
         },
     )
     assert response.status_code == 404
@@ -396,18 +412,16 @@ def test_remove_sentiment_missing_token(test_app):
 
 
 # Test removing a sentiment fails due to expired token
-def test_remove_sentiment_expired_token(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_remove_sentiment_expired_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_expired_token_exception,
     )
 
-    test_app.config["ACCESS_TOKEN_EXPIRATION"] = -1
-
-    tokens = login_user(user.id)
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_expired_token_exception
+    )
 
     client = test_app.test_client()
 
@@ -415,7 +429,7 @@ def test_remove_sentiment_expired_token(
         "/sentiment/1",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
         },
     )
     assert response.status_code == 401
@@ -425,7 +439,17 @@ def test_remove_sentiment_expired_token(
 
 
 # Test removing a sentiment fails due to invalid token
-def test_remove_sentiment_invalid_token(test_app, test_database):
+def test_remove_sentiment_invalid_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_invalid_token_exception,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_invalid_token_exception
+    )
+
     client = test_app.test_client()
 
     response = client.delete(
@@ -442,26 +466,26 @@ def test_remove_sentiment_invalid_token(test_app, test_database):
 
 
 # Test update a sentiment passes
-def test_update_sentiment(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_update_sentiment(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
 
-    tokens = login_user(user.id)
-    sentiment = add_sentiments(user_id=user.id, keyword="test_keyword_one")
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
+    )
+    monkeypatch.setattr(
+        views, "update_sentiment", mock_objects.update_sentiment
+    )
 
     client = test_app.test_client()
 
     response = client.put(
-        f"/sentiment/{sentiment.id}",
+        "/sentiment/1",
         data=json.dumps({"keyword": "test_sentiment_update"}),
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
             "Content-Type": "application/json",
         },
     )
@@ -469,32 +493,25 @@ def test_update_sentiment(
     assert response.status_code == 200
 
     data = response.get_json()
-    assert data["id"] == sentiment.id
-    assert data["user_id"] == user.id
+    assert data["id"] == 1
+    assert data["user_id"] == 1
     assert data["keyword"] == "test_sentiment_update"
 
 
 # Test update a sentiment fails due to empty data
-def test_update_sentiment_empty_data(
-    test_app, test_database, add_user, login_user, add_sentiments
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_update_sentiment_empty_data(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
-
-    tokens = login_user(user.id)
-    sentiment = add_sentiments(user_id=user.id, keyword="test_keyword_one")
 
     client = test_app.test_client()
 
     response = client.put(
-        f"/sentiment/{sentiment.id}",
+        "/sentiment/1",
         data=json.dumps({}),
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
             "Content-Type": "application/json",
         },
     )
@@ -506,16 +523,14 @@ def test_update_sentiment_empty_data(
 
 
 # Test update a sentiment fails due to invalid id
-def test_update_sentiment_invalid_id(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_update_sentiment_invalid_id(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
     )
 
-    tokens = login_user(user.id)
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_no_sentiment_by_id
+    )
 
     client = test_app.test_client()
     response = client.put(
@@ -523,7 +538,7 @@ def test_update_sentiment_invalid_id(
         data=json.dumps({"keyword": "test_sentiment_update"}),
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
             "Content-Type": "application/json",
         },
     )
@@ -559,7 +574,15 @@ def test_update_sentiment_invalid_headers(test_app):
 
 
 # Test update a sentiment fails due to missing token
-def test_update_sentiment_missing_token(test_app):
+def test_update_sentiment_missing_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
+    )
+
     client = test_app.test_client()
 
     response = client.put(
@@ -578,18 +601,16 @@ def test_update_sentiment_missing_token(test_app):
 
 
 # Test update a sentiment fails due to expired token
-def test_update_sentiment_expired_token(
-    test_app, test_database, add_user, login_user
-):
-    user = add_user(
-        username="test_user_one",
-        email="test_user_one@mail.com",
-        password="test_password_one",
+def test_update_sentiment_expired_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_expired_token_exception,
     )
 
-    test_app.config["ACCESS_TOKEN_EXPIRATION"] = -1
-
-    tokens = login_user(user.id)
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
+    )
 
     client = test_app.test_client()
 
@@ -598,7 +619,7 @@ def test_update_sentiment_expired_token(
         data=json.dumps({"keyword": "test_sentiment_update"}),
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {tokens.access_token}",
+            "Authorization": "Bearer access_token",
             "Content-Type": "application/json",
         },
     )
@@ -609,7 +630,17 @@ def test_update_sentiment_expired_token(
 
 
 # Test update a sentiment fails due to invalid token
-def test_update_sentiment_invalid_token(test_app):
+def test_update_sentiment_invalid_token(test_app, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_invalid_token_exception,
+    )
+
+    monkeypatch.setattr(
+        views, "get_sentiment_by_id", mock_objects.get_sentiment_by_id
+    )
+
     client = test_app.test_client()
 
     response = client.put(

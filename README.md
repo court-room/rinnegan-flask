@@ -1,8 +1,9 @@
 # rinnegan-flask
 
-[![lint Actions Status](https://github.com/court-room/rinnegan-flask/workflows/lint/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
+[![test Actions Status](https://github.com/court-room/rinnegan-flask/workflows/test/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
 [![docker Actions Status](https://github.com/court-room/rinnegan-flask/workflows/docker/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/court-room/rinnegan-flask/?ref=repository-badge)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=court-room/rinnegan-flask)](https://dependabot.com)
 
 ## Pre-Requisite
 
