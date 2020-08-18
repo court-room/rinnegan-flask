@@ -67,3 +67,7 @@ jobs:
       - name: Run unit tests
         run: |
           pytest -c app/tests/pytest.ini
+
+      - name: Push the test coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash)
