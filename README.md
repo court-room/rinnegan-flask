@@ -1,5 +1,6 @@
-# rinnegan-server
+# rinnegan-flask
 
+[![lint Actions Status](https://github.com/court-room/rinnegan-flask/workflows/lint/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
 [![docker Actions Status](https://github.com/court-room/rinnegan-flask/workflows/docker/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/court-room/rinnegan-flask/?ref=repository-badge)
 
