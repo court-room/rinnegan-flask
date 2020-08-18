@@ -15,16 +15,9 @@ RUN pip install pipenv==2018.11.26 && \
 
 ##############################################################################
 
-FROM python:3.8.5-alpine
+FROM python:3.8.5-slim-buster
 
 WORKDIR /usr/src/app
-
-RUN apk update && \
-    apk add --no-cache build-base postgresql-dev libffi-dev && \
-    rm -rf /var/cache/apk/*
-
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
 
 COPY --from=builder /usr/src/app/wheels /wheels
 
