@@ -1,8 +1,10 @@
 .git/
 .github/
+.pytest_cache/
 .vscode/
+tests/
 
-_config.yml
+.coveragerc
 .deepsource.toml
 .dockerignore
 .env.example
