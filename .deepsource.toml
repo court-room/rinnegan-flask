@@ -1,10 +1,10 @@
 version = 1
 
 test_patterns = [
-    "*tests/**"
+    "tests/**"
 ]
 
-exclude_patterns = ["migrations/**", "*tests/**"]
+exclude_patterns = ["migrations/**", "tests/**"]
 
 [[analyzers]]
 name = "docker"

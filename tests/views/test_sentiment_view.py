@@ -1,7 +1,7 @@
 import json
 
 from app.api.sentiment import views
-from app.tests import mock_objects
+from tests import mock_objects
 
 
 # Test sentiment creation passes
