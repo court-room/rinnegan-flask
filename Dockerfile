@@ -1,11 +1,8 @@
-FROM python:3.8.5-alpine as builder
+FROM python:3.8.5 as builder
 
 LABEL maintainer="onlinejudge95<onlinejudge95@gmail.com>"
 
 WORKDIR /usr/src/app
-
-RUN apk update && \
-    apk add --no-cache build-base postgresql-dev libffi-dev
 
 COPY ./Pipfile ./
 
