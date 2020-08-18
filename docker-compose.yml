@@ -1,15 +1,43 @@
-version: "3.7"
+version: "3.8"
+
+volumes:
+  data:
+    external: true
+    name: rinnegan-data
+
+networks:
+  database:
+    external: true
+    name: rinnegan-database
+  backend:
+    external: true
+    name: rinnegan-backend
 
 services:
-  server:
-    container_name: server
-    image: server:development
+  postgres:
+    container_name: rinnegan-postgres
+    image: onlinejudge95/rinnegan-postgres
+    environment:
+      - POSTGRES_USER=rinnegan
+      - POSTGRES_PASSWORD=rinnegan
+    expose:
+      - 5432
+    networks:
+      - database
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  flask:
+    container_name: rinnegan-flask
+    image: rinnegan-flask:slim-buster
     env_file:
       - .env
+    networks:
+      - backend
+      - database
     ports:
       - 5000:5000
     volumes:
       - .:/usr/src/app
     build:
       context: .
-      dockerfile: Dockerfile
