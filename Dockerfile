@@ -16,6 +16,8 @@ FROM python:3.8.5-slim-buster
 
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get install libpq-dev -y
+
 COPY --from=builder /usr/src/app/wheels /wheels
 
 RUN pip install --no-cache-dir /wheels/*
