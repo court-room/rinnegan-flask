@@ -1,16 +1,16 @@
 import json
 
 from app.api.users import views
-from tests import mock_objects
+from tests.views import mocks
 
 
 # Test user creation passes
 def test_add_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+        views, "get_user_by_email", mocks.get_no_user_by_email,
     )
 
-    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
+    monkeypatch.setattr(views, "add_user", mocks.add_user)
 
     client = test_app.test_client()
     response = client.post(
@@ -71,10 +71,10 @@ def test_add_user_invalid_data(test_app):
 # Test user creation fails due to duplicate entry
 def test_add_user_duplicate_email(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_by_email,
+        views, "get_user_by_email", mocks.get_user_by_email,
     )
 
-    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
+    monkeypatch.setattr(views, "add_user", mocks.add_user)
 
     client = test_app.test_client()
     response = client.post(
@@ -124,9 +124,9 @@ def test_add_user_invalid_header(test_app):
 # Test fetching user list passes
 def test_get_users(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
-    monkeypatch.setattr(views, "get_all_users", mock_objects.get_all_users)
+    monkeypatch.setattr(views, "get_all_users", mocks.get_all_users)
 
     client = test_app.test_client()
     response = client.get(
@@ -154,9 +154,9 @@ def test_get_users(test_app, monkeypatch):
 # Test fetching user list fails due to missing token
 def test_get_users_missing_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
-    monkeypatch.setattr(views, "get_all_users", mock_objects.get_all_users)
+    monkeypatch.setattr(views, "get_all_users", mocks.get_all_users)
 
     client = test_app.test_client()
 
@@ -170,11 +170,9 @@ def test_get_users_missing_token(test_app, monkeypatch):
 # Test fetching user list fails due to expired token
 def test_get_users_expired_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_expired_token_exception,
+        views, "get_user_id_by_token", mocks.get_expired_token_exception,
     )
-    monkeypatch.setattr(views, "get_all_users", mock_objects.get_all_users)
+    monkeypatch.setattr(views, "get_all_users", mocks.get_all_users)
 
     client = test_app.test_client()
 
@@ -194,11 +192,9 @@ def test_get_users_expired_token(test_app, monkeypatch):
 # Test fetching user list fails due to invalid token
 def test_get_users_invalid_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_invalid_token_exception,
+        views, "get_user_id_by_token", mocks.get_invalid_token_exception,
     )
-    monkeypatch.setattr(views, "get_all_users", mock_objects.get_all_users)
+    monkeypatch.setattr(views, "get_all_users", mocks.get_all_users)
     client = test_app.test_client()
 
     response = client.get(
@@ -217,10 +213,10 @@ def test_get_users_invalid_token(test_app, monkeypatch):
 # Test fetching single user passes
 def test_single_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -243,12 +239,10 @@ def test_single_user(test_app, monkeypatch):
 # Test fetching single user fails due to incorrect id
 def test_single_user_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
 
@@ -268,10 +262,10 @@ def test_single_user_invalid_id(test_app, monkeypatch):
 # Test fetching single user fails due to missing token
 def test_single_user_missing_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -286,12 +280,10 @@ def test_single_user_missing_token(test_app, monkeypatch):
 # Test fetching single user fails due to expired token
 def test_single_user_expired_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_expired_token_exception,
+        views, "get_user_id_by_token", mocks.get_expired_token_exception,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -311,12 +303,10 @@ def test_single_user_expired_token(test_app, monkeypatch):
 # Test fetching single user fails due to invalid token
 def test_single_user_invalid_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_invalid_token_exception,
+        views, "get_user_id_by_token", mocks.get_invalid_token_exception,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -336,11 +326,11 @@ def test_single_user_invalid_token(test_app, monkeypatch):
 # Test removing a user passes
 def test_remove_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
-    monkeypatch.setattr(views, "remove_user", mock_objects.remove_user)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
+    monkeypatch.setattr(views, "remove_user", mocks.remove_user)
 
     client = test_app.test_client()
 
@@ -357,12 +347,10 @@ def test_remove_user(test_app, monkeypatch):
 # Test removing a user fails due to invalid id
 def test_remove_user_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
 
@@ -382,12 +370,10 @@ def test_remove_user_invalid_id(test_app, monkeypatch):
 # Test removing a user fails due to missing token
 def test_remove_user_missing_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
 
@@ -404,14 +390,10 @@ def test_remove_user_missing_token(test_app, monkeypatch):
 # Test removing a user fails due to expired token
 def test_remove_user_expired_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_expired_token_exception,
+        views, "get_user_id_by_token", mocks.get_expired_token_exception,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
 
@@ -431,14 +413,10 @@ def test_remove_user_expired_token(test_app, monkeypatch):
 # Test removing a user fails due to invalid token
 def test_remove_user_invalid_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_invalid_token_exception,
+        views, "get_user_id_by_token", mocks.get_invalid_token_exception,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
 
@@ -458,11 +436,11 @@ def test_remove_user_invalid_token(test_app, monkeypatch):
 # Test update a user passes
 def test_update_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
-    monkeypatch.setattr(views, "update_user", mock_objects.update_user)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
+    monkeypatch.setattr(views, "update_user", mocks.update_user)
 
     client = test_app.test_client()
 
@@ -492,11 +470,11 @@ def test_update_user(test_app, monkeypatch):
 # Test update a user fails due to empty data
 def test_update_user_empty_data(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
-    monkeypatch.setattr(views, "update_user", mock_objects.update_user)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
+    monkeypatch.setattr(views, "update_user", mocks.update_user)
 
     client = test_app.test_client()
 
@@ -519,12 +497,10 @@ def test_update_user_empty_data(test_app, monkeypatch):
 # Test update a user fails due to invalid id
 def test_update_user_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(
-        views, "get_user_by_id", mock_objects.get_no_user_by_id
-    )
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_no_user_by_id)
 
     client = test_app.test_client()
     response = client.put(
@@ -575,10 +551,10 @@ def test_update_user_invalid_headers(test_app):
 # Test update a user fails due to missing token
 def test_update_user_missing_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -605,12 +581,10 @@ def test_update_user_missing_token(test_app, monkeypatch):
 # Test update a user fails due to expired token
 def test_update_user_expired_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_expired_token_exception,
+        views, "get_user_id_by_token", mocks.get_expired_token_exception,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 
@@ -637,12 +611,10 @@ def test_update_user_expired_token(test_app, monkeypatch):
 # Test update a user fails due to invalid token
 def test_update_user_invalid_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_invalid_token_exception,
+        views, "get_user_id_by_token", mocks.get_invalid_token_exception,
     )
 
-    monkeypatch.setattr(views, "get_user_by_id", mock_objects.get_user_by_id)
+    monkeypatch.setattr(views, "get_user_by_id", mocks.get_user_by_id)
 
     client = test_app.test_client()
 

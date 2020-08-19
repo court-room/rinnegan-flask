@@ -1,16 +1,16 @@
 import json
 
 from app.api.auth import views
-from tests import mock_objects
+from tests.views import mocks
 
 
 # Test user registration passes
 def test_user_registration(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+        views, "get_user_by_email", mocks.get_no_user_by_email,
     )
 
-    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
+    monkeypatch.setattr(views, "add_user", mocks.add_user)
 
     client = test_app.test_client()
 
@@ -75,11 +75,9 @@ def test_user_registration_invalid_data(test_app):
 
 # Test user registration fails due to duplicate entry
 def test_user_registration_duplicate_entry(test_app, monkeypatch):
-    monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_by_email
-    )
+    monkeypatch.setattr(views, "get_user_by_email", mocks.get_user_by_email)
 
-    monkeypatch.setattr(views, "add_user", mock_objects.add_user)
+    monkeypatch.setattr(views, "add_user", mocks.add_user)
 
     client = test_app.test_client()
 
@@ -130,12 +128,10 @@ def test_user_registration_invalid_header(test_app):
 # Test user login passes
 def test_user_login(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_object_by_email,
+        views, "get_user_by_email", mocks.get_user_object_by_email,
     )
-    monkeypatch.setattr(views, "add_token", mock_objects.add_token)
-    monkeypatch.setattr(
-        views, "password_matches", mock_objects.password_matches
-    )
+    monkeypatch.setattr(views, "add_token", mocks.add_token)
+    monkeypatch.setattr(views, "password_matches", mocks.password_matches)
 
     client = test_app.test_client()
     response = client.post(
@@ -159,11 +155,9 @@ def test_user_login(test_app, monkeypatch):
 # Test user login fails due to wrong password
 def test_user_login_wrong_password(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_by_email,
+        views, "get_user_by_email", mocks.get_user_by_email,
     )
-    monkeypatch.setattr(
-        views, "password_matches", mock_objects.password_not_matches
-    )
+    monkeypatch.setattr(views, "password_matches", mocks.password_not_matches)
     client = test_app.test_client()
     response = client.post(
         "/auth/login",
@@ -185,7 +179,7 @@ def test_user_login_wrong_password(test_app, monkeypatch):
 # Test user login fails due to unregistered user
 def test_user_login_unregistered_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+        views, "get_user_by_email", mocks.get_no_user_by_email,
     )
     client = test_app.test_client()
     response = client.post(
@@ -232,9 +226,9 @@ def test_user_login_invalid_header(test_app):
 # Test refresh token passes
 def test_refresh_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views, "get_user_id_by_token", mocks.get_user_id_by_token,
     )
-    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
+    monkeypatch.setattr(views, "update_token", mocks.update_token)
 
     client = test_app.test_client()
     response = client.post(
@@ -255,11 +249,9 @@ def test_refresh_token(test_app, monkeypatch):
 # Test refresh token fails due to expired token
 def test_refresh_token_expired(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_expired_token_exception,
+        views, "get_user_id_by_token", mocks.get_expired_token_exception,
     )
-    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
+    monkeypatch.setattr(views, "update_token", mocks.update_token)
 
     client = test_app.test_client()
     response = client.post(
@@ -279,11 +271,9 @@ def test_refresh_token_expired(test_app, monkeypatch):
 # Test refresh token fails due to invalid token
 def test_refresh_token_invalid(test_app, monkeypatch):
     monkeypatch.setattr(
-        views,
-        "get_user_id_by_token",
-        mock_objects.get_invalid_token_exception,
+        views, "get_user_id_by_token", mocks.get_invalid_token_exception,
     )
-    monkeypatch.setattr(views, "update_token", mock_objects.update_token)
+    monkeypatch.setattr(views, "update_token", mocks.update_token)
 
     client = test_app.test_client()
     response = client.post(

@@ -1,12 +1,10 @@
 from app.api.health import views
-from tests import mock_objects
+from tests.views import mocks
 
 
 # Test health check passes
 def test_health_check_passes(test_app, monkeypatch):
-    monkeypatch.setattr(
-        views, "get_health_status", mock_objects.health_check_pass
-    )
+    monkeypatch.setattr(views, "get_health_status", mocks.health_check_pass)
     client = test_app.test_client()
     response = client.get(
         "/health",
