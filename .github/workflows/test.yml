@@ -74,9 +74,9 @@ jobs:
 
       - name: Run unit tests
         env:
-          SECRET_KEY: NOT_SO_SECRET_KEY_FOR_TEST
-          DATABASE_URL: DUMMY_DATABASE_URL
-          DATABASE_TEST_URL: DUMMY_DATABASE_TEST_URL
+          SECRET_KEY_FILE: NOT_SO_SECRET_KEY_FOR_TEST
+          DATABASE_URL_FILE: DUMMY_DATABASE_URL
+          DATABASE_TEST_URL_FILE: DUMMY_DATABASE_TEST_URL
         run: |
           pytest -c tests/pytest.ini
 
