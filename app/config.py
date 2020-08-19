@@ -25,7 +25,6 @@ class BaseConfig:
     TESTING = True
     SECRET_KEY = read_secrets(os.getenv("SECRET_KEY_FILE"))
     JSON_SORT_KEYS = True
-    HEALTHCHECK_FILE_PATH = "heartbeat.json"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = read_secrets(os.getenv("DATABASE_URL_FILE"))
     BCRYPT_LOG_ROUNDS = 13
