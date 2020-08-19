@@ -17,12 +17,8 @@ class Health(Resource):
     def get():
         response = get_health_status()
 
-        if response["health"] == "good":
-            logger.info("Health check passing")
-            return response, 200
-
-        logger.info("Health check fails")
-        return response, 404
+        logger.info("Health check passing")
+        return response, 200
 
 
 health_namespace.add_resource(Health, "")
