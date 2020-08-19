@@ -21,7 +21,7 @@ Server socket
         range.
 """
 
-bind = f"0.0.0.0:{os.getenv('PORT')}"
+bind = "0.0.0.0:5000"
 backlog = 2048
 
 """
