@@ -1,7 +1,6 @@
 #!/bin/bash
 
 pipenv run black \
---check \
 --config pyproject.toml \
 .
 
@@ -12,7 +11,6 @@ pipenv run flake8 \
 pipenv run isort \
 --atomic \
 --case-sensitive \
---check-only \
 --force-alphabetical-sort-within-sections \
 --force-single-line-imports \
 --lines-after-imports 2 \

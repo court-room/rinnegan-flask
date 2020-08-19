@@ -4,7 +4,8 @@ import os
 def read_secrets(secret_file_path):
     """
     Utility method to fetch secrets depending upon the environment.
-    First an attempt is made to read the secret from the file defined in the env variable.
+    First an attempt is made to read the secret from the file
+    defined in the env variable.
     If the file does not exist then the value read is returned.
 
     :param: secret_file_path
