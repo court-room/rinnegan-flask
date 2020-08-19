@@ -2,15 +2,22 @@ import os
 
 
 def read_secrets(secret_file_path):
+    """
+    Utility method to fetch secrets depending upon the environment.
+    First an attempt is made to read the secret from the file defined in the env variable.
+    If the file does not exist then the value read is returned.
+
+    :param: secret_file_path
+        Path to file or the secret
+    :returns:
+        Secret stored in the environment or the file
+    """
     try:
         with open(secret_file_path, "r") as fp:
             secret = fp.readline().strip()
         return secret
     except FileNotFoundError:
-        file_key = secret_file_path.split("_")
-        env_var = "_".join(file_key[:-1])
-
-        return os.getenv(env_var)
+        return secret_file_path
 
 
 class BaseConfig:
@@ -34,7 +41,7 @@ class DevelopmentConfig(BaseConfig):
 
 class TestingConfig(BaseConfig):
     JSON_SORT_KEYS = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL_FILE")
     BCRYPT_LOG_ROUNDS = 4
     ACCESS_TOKEN_EXPIRATION = 3
     REFRESH_TOKEN_EXPIRATION = 3
