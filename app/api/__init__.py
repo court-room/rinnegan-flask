@@ -1,7 +1,7 @@
 from flask_restx import Api
 
 from app.api.auth.views import auth_namespace
-from app.api.health import health_namespace
+from app.api.health.views import health_namespace
 from app.api.sentiment.views import sentiment_namespace
 from app.api.users.views import users_namespace
 

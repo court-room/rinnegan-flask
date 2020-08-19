@@ -19,6 +19,14 @@ class Sentiment(dict):
         self.__dict__ = self
 
 
+def health_check_pass():
+    return {"health": "good"}
+
+
+def health_check_fails():
+    return {"health": "bad"}
+
+
 def get_user_id_by_token(token):
     return 1
 
