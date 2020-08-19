@@ -2,6 +2,7 @@
 
 [![test Actions Status](https://github.com/court-room/rinnegan-flask/workflows/test/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
 [![docker Actions Status](https://github.com/court-room/rinnegan-flask/workflows/docker/badge.svg)](https://github.com/court-room/rinnegan-flask/actions)
+[![codecov](https://codecov.io/gh/court-room/rinnegan-flask/branch/master/graph/badge.svg)](https://codecov.io/gh/court-room/rinnegan-flask)
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/court-room/rinnegan-flask/?ref=repository-badge)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=court-room/rinnegan-flask)](https://dependabot.com)
 
