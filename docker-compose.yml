@@ -29,7 +29,7 @@ services:
 
   flask:
     container_name: rinnegan-flask
-    image: rinnegan-flask:slim-buster
+    image: rinnegan-flask
     env_file:
       - .env
     networks:
