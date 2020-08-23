@@ -1,4 +1,5 @@
 from app import db
+from app import queue
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import update_user_sentiment_quota
 
@@ -70,3 +71,24 @@ def update_sentiment(sentiment, keyword):
     sentiment.keyword = keyword
     db.session.commit()
     return sentiment
+
+
+def is_user_sentiment_quota_exhausted(user_id):
+    """
+    Utility method to find if user has exhausted their
+    sentiment quota for keyword analysis
+
+    :param: user_id
+        ID of the user
+    :returns:
+        Status of quota
+    """
+    user = get_user_by_id(user_id)
+
+    return user.sentiment_quota < app.config.get("SENTIMENT_QUOTA_LIMIT")
+
+
+def add_to_queue(keyword, user_id):
+    print(keyword, user_id)
+    print(type(queue))
+

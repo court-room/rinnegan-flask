@@ -5,6 +5,8 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from redis import Redis
+from rq import Queue
 
 from app.config import cfg_map
 
@@ -13,6 +15,7 @@ db = SQLAlchemy()
 cors = CORS()
 bcrypt = Bcrypt()
 migrate = Migrate()
+queue = None
 
 
 def create_app(environemnt):
@@ -37,6 +40,11 @@ def create_app(environemnt):
     cors.init_app(app, resources={r"/*": {"origins": "*"}})
     bcrypt.init_app(app)
     migrate.init_app(app, db)
+    queue = Queue(
+        app.config.get("REDIS_QUEUE_NAME"),
+        connection=Redis.from_url(app.config.get("REDIS_URL")),
+    )
+    app.queue = queue
 
     from app.api import api
 
