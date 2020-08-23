@@ -1,26 +1,12 @@
+from flask import current_app
+from redis import Redis
+
+
+# from rq import Queue
+
 from app import db
-from app import queue
 from app.api.sentiment.models import Sentiment
-from app.api.users.crud import update_user_sentiment_quota
-
-
-def add_sentiment(keyword, user_id):
-    """
-    Adds a sentiment with given details and returns an instance of it.
-
-    :param: keyword
-        keyword to find sentiment for
-    :param: user_id
-        Id of the user
-    :returns:
-        Sentiment with given details
-    """
-    sentiment = Sentiment(keyword=keyword, user_id=user_id)
-    db.session.add(sentiment)
-    db.session.commit()
-
-    update_user_sentiment_quota(user_id)
-    return sentiment
+from app.api.users.crud import get_user_by_id
 
 
 def get_all_sentiments():
@@ -85,10 +71,41 @@ def is_user_sentiment_quota_exhausted(user_id):
     """
     user = get_user_by_id(user_id)
 
-    return user.sentiment_quota < app.config.get("SENTIMENT_QUOTA_LIMIT")
+    return user.sentiment_quota < 0
+
+
+def update_user_sentiment_quota(user_id):
+    """
+    Utility method to update sentiment quota for a user
+
+    :param: user_id
+    """
+    user = get_user_by_id(user_id)
+
+    user.sentiment_quota -= 1
+    db.session.commit()
+
+
+def add_sentiment(keyword, user_id):
+    """
+    Adds a sentiment with given details and returns an instance of it.
+
+    :param: keyword
+        keyword to find sentiment for
+    :param: user_id
+        Id of the user
+    :returns:
+        Sentiment with given details
+    """
+    sentiment = Sentiment(keyword=keyword, user_id=user_id)
+    db.session.add(sentiment)
+    db.session.commit()
+
+    update_user_sentiment_quota(user_id)
+    return sentiment
 
 
 def add_to_queue(keyword, user_id):
-    print(keyword, user_id)
-    print(type(queue))
+    queue = Redis.from_url(current_app.config.get("REDIS_URL"))
 
+    response = queue.publish(current_app.config.get("REDIS_CHANNEL"), keyword)

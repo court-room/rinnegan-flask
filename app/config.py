@@ -33,7 +33,7 @@ class BaseConfig:
     REFRESH_TOKEN_EXPIRATION = 2592000
     JWT_ENCODE_ALGORITHM = "HS256"
     SENTIMENT_QUOTA_LIMIT = 5
-    REDIS_QUEUE_NAME = "sentiments"
+    REDIS_CHANNEL = "keywords"
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
 
 
