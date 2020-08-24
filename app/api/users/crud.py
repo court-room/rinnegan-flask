@@ -84,15 +84,3 @@ def update_user(user, username, email):
     user.email = email
     db.session.commit()
     return user
-
-
-def update_user_sentiment_quota(user_id):
-    """
-    Utility method to update sentiment quota for a user
-
-    :param: user_id
-    """
-    user = get_user_by_id(user_id)
-
-    user.sentiment_quota -= 1
-    db.session.commit()
