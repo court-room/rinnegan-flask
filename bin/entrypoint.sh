@@ -1,8 +1,11 @@
 #!/bin/sh
 
-if [ $STAGE != "local" ]; then
-    flask db upgrade
-fi
+flask db upgrade
 
-# gunicorn --config /usr/src/app/gunicorn.conf.py manage:app
-flask run -h 0.0.0.0
+if [ $FLASK_ENV != "development" ]; then
+    echo "Running Gunicorn with eventlet workers"
+    gunicorn --config /usr/src/app/gunicorn.conf.py manage:app
+else
+    echo "Running the single threaded flask server"
+    flask run --host 0.0.0.0
+fi
