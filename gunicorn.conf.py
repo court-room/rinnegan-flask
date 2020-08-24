@@ -79,7 +79,7 @@ worker_class = "eventlet"
 worker_connections = 1000
 timeout = 30
 keepalive = 2
-spew = False
+spew = True
 
 """
 Server mechanics
@@ -107,7 +107,6 @@ Server mechanics
         can be retrieved with a call to pwd.getgrnam(value) or None
         to change the worker processes group.
 
-    umask - A mask for file permissions written by Gunicorn. Note that
         this affects unix socket permissions.
 
         A valid value for the os.umask(mode) call or a string

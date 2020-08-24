@@ -33,6 +33,8 @@ class BaseConfig:
     REFRESH_TOKEN_EXPIRATION = 2592000
     JWT_ENCODE_ALGORITHM = "HS256"
     SENTIMENT_QUOTA_LIMIT = 5
+    REDIS_CHANNEL = "keywords"
+    REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
 
 
 class DevelopmentConfig(BaseConfig):
@@ -41,6 +43,7 @@ class DevelopmentConfig(BaseConfig):
 
 
 class TestingConfig(BaseConfig):
+    REDIS_URL = "placeholder"
     JSON_SORT_KEYS = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL_FILE")
     BCRYPT_LOG_ROUNDS = 4

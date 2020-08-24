@@ -13,6 +13,7 @@ def test_add_sentiment(test_app, monkeypatch):
         "is_user_sentiment_quota_exhausted",
         mock_objects.user_sentiment_quota_not_exhausted,
     )
+    monkeypatch.setattr(views, "add_to_queue", mock_objects.add_to_queue)
 
     client = test_app.test_client()
     response = client.post(
