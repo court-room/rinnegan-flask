@@ -1,12 +1,12 @@
 from flask import current_app
 from redis import Redis
 
-
-# from rq import Queue
-
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
+
+
+# from rq import Queue
 
 
 def get_all_sentiments():
@@ -105,7 +105,13 @@ def add_sentiment(keyword, user_id):
     return sentiment
 
 
-def add_to_queue(keyword, user_id):
+def add_to_queue(keyword):
+    """
+    Adds a keyword to the queue for the worker to process
+
+    :param: keyword
+        keyword to find sentiment for
+    """
     queue = Redis.from_url(current_app.config.get("REDIS_URL"))
 
-    response = queue.publish(current_app.config.get("REDIS_CHANNEL"), keyword)
+    queue.publish(current_app.config.get("REDIS_CHANNEL"), keyword)
