@@ -172,5 +172,5 @@ def update_sentiment(sentiment, keyword):
     return mock_sentiment
 
 
-def add_queue(keyword):
+def add_to_queue(keyword):
     pass
