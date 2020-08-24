@@ -1,5 +1,6 @@
+import redis
+
 from flask import current_app
-from redis import Redis
 
 from app import db
 from app.api.sentiment.models import Sentiment
@@ -112,6 +113,6 @@ def add_to_queue(keyword):
     :param: keyword
         keyword to find sentiment for
     """
-    queue = Redis.from_url(current_app.config.get("REDIS_URL"))
+    queue = redis.Redis.from_url(current_app.config.get("REDIS_URL"))
 
     queue.publish(current_app.config.get("REDIS_CHANNEL"), keyword)

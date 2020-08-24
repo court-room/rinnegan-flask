@@ -43,6 +43,7 @@ class DevelopmentConfig(BaseConfig):
 
 
 class TestingConfig(BaseConfig):
+    REDIS_URL = "placeholder"
     JSON_SORT_KEYS = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL_FILE")
     BCRYPT_LOG_ROUNDS = 4
