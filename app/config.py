@@ -37,7 +37,6 @@ class BaseConfig:
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
     CELERY_BROKER_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
     CELERY_RESULT_BACKEND = read_secrets(os.getenv("REDIS_URL_FILE"))
-    CELERY_ALWAYS_EAGER = False
 
 
 class DevelopmentConfig(BaseConfig):
