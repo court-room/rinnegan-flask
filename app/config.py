@@ -35,6 +35,8 @@ class BaseConfig:
     SENTIMENT_QUOTA_LIMIT = 5
     REDIS_CHANNEL = "keywords"
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
+    CELERY_BROKER_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
+    CELERY_RESULT_BACKEND = read_secrets(os.getenv("REDIS_URL_FILE"))
 
 
 class DevelopmentConfig(BaseConfig):

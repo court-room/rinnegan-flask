@@ -1,3 +1,6 @@
+import os
+
+from celery import Celery
 from flask import abort
 from flask import Flask
 from flask import request
@@ -13,6 +16,7 @@ db = SQLAlchemy()
 cors = CORS()
 bcrypt = Bcrypt()
 migrate = Migrate()
+celery = Celery("rinnegan", broker = os.getenv("REDIS_URL_FILE"))
 
 
 def create_app(environemnt):
@@ -37,6 +41,7 @@ def create_app(environemnt):
     cors.init_app(app, resources={r"/*": {"origins": "*"}})
     bcrypt.init_app(app)
     migrate.init_app(app, db)
+    celery.conf.update(app.config)
 
     from app.api import api
 

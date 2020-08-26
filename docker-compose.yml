@@ -30,27 +30,28 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
 
-  # redis:
-  #   container_name: rinnegan-redis
-  #   image: onlinejudge95/rinnegan-redis
-  #   depends_on:
-  #     - flask
-  #   environment:
-  #     - POSTGRES_USER=rinnegan
-  #     - POSTGRES_PASSWORD=rinnegan
-  #   expose:
-  #     - 6379
-  #   networks:
-  #     - backend
-  #     - queue
-  #   volumes:
-  #     - data:/var/lib/postgresql/data
+  worker:
+    container_name: rinnegan-worker
+    image: rinnegan-worker
+    env_file:
+      - .env
+    environment:
+      - NODE_TYPE=worker
+    networks:
+      - backend
+      - database
+    volumes:
+      - .:/usr/src/app
+    build:
+      context: .
 
   flask:
     container_name: rinnegan-flask
     image: rinnegan-flask
     env_file:
       - .env
+    environment:
+      - NODE_TYPE=server
     networks:
       - backend
       - database

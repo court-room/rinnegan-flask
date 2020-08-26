@@ -23,33 +23,6 @@ logger = logging.getLogger(__name__)
 
 class UsersList(Resource):
     @staticmethod
-    @users_namespace.expect(user_writable, validate=True)
-    @users_namespace.response(201, "Successfully added the user")
-    @users_namespace.response(
-        400, "Sorry.The provided email <user_email> is already registered"
-    )
-    def post():
-        request_data = request.get_json()
-        email = request_data["email"]
-        response = {}
-
-        user_exists = get_user_by_email(email)
-        if user_exists:
-            logger.info(f"User with email {email} exists")
-            response[
-                "message"
-            ] = f"Sorry.The provided email {email} is already registered"
-            return response, 400
-
-        user = add_user(
-            request_data["username"], email, request_data["password"],
-        )
-        response["id"] = user.id
-        response["message"] = f"{email} was added"
-        logger.info(f"User with email {email} added successfully")
-        return response, 201
-
-    @staticmethod
     @users_namespace.expect(parser, validate=True)
     @users_namespace.marshal_with(user_readable, as_list=True)
     def get():
