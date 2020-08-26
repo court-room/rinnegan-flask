@@ -7,14 +7,11 @@ from jwt import InvalidTokenError
 
 from app.api.auth.crud import get_user_id_by_token
 from app.api.auth.serializers import parser
-from app.api.users.crud import add_user
 from app.api.users.crud import get_all_users
-from app.api.users.crud import get_user_by_email
 from app.api.users.crud import get_user_by_id
 from app.api.users.crud import remove_user
 from app.api.users.crud import update_user
 from app.api.users.serializers import user_readable
-from app.api.users.serializers import user_writable
 from app.api.users.serializers import users_namespace
 
 

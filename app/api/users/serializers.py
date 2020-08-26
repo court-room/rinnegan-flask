@@ -12,7 +12,3 @@ user_readable = users_namespace.model(
         "email": fields.String(required=True),
     },
 )
-
-user_writable = users_namespace.inherit(
-    "New-User", user_readable, {"password": fields.String(required=True)},
-)

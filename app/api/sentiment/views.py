@@ -12,12 +12,11 @@ from app.api.sentiment.crud import get_all_sentiments
 from app.api.sentiment.crud import get_sentiment_by_id
 from app.api.sentiment.crud import is_user_sentiment_quota_exhausted
 from app.api.sentiment.crud import remove_sentiment
-
 from app.api.sentiment.crud import update_sentiment
 from app.api.sentiment.serializers import sentiment_namespace
 from app.api.sentiment.serializers import sentiment_schema
 from app.api.sentiment.serializers import update_sentiment_schema
-from app.api.tasks.sentiment import add_to_queue
+from app.api.sentiment.tasks import start_analysis
 from app.api.users.crud import get_user_by_id
 
 
@@ -48,7 +47,7 @@ class SentimentList(Resource):
         if not is_user_sentiment_quota_exhausted(user_id):
             sentiment = add_sentiment(keyword, user_id)
 
-            task = add_to_queue.apply_async(args=[keyword])
+            task = start_analysis.apply_async(args=[keyword])
 
             response["id"] = sentiment.id
             response["message"] = f"{keyword} was added"

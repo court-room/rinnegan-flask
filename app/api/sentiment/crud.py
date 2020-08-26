@@ -1,5 +1,3 @@
-from flask import current_app
-
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id

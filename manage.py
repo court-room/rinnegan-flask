@@ -4,7 +4,8 @@ import os
 
 import yaml
 
-from app import create_app
+from app import celery
+from app import factory
 
 
 def setup_logging():
@@ -30,4 +31,4 @@ def setup_logging():
 
 
 setup_logging()
-app = create_app(os.getenv("FLASK_ENV"))
+app = factory.create_app(os.getenv("FLASK_ENV"), celery=celery)
