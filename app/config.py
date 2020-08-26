@@ -17,7 +17,7 @@ def read_secrets(secret_file_path):
         with open(secret_file_path, "r") as fp:
             secret = fp.readline().strip()
         return secret
-    except FileNotFoundError, TypeError:
+    except (FileNotFoundError, TypeError):
         return secret_file_path
 
 

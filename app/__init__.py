@@ -1,8 +1,12 @@
+import os
+
 from celery import Celery
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+
+from app import config
 
 
 db = SQLAlchemy()
@@ -21,13 +25,13 @@ def make_celery(app_name=__name__):
     :returns:
         Instance of celery
     """
-    backend = os.getenv("REDIS_URL")
-    broker = backend.replace("0", "1")
+    backend_string = config.read_secrets(os.getenv("REDIS_URL_FILE"))
+    broker_string = backend_string.replace("0", "1")
 
     return Celery(
         app_name,
-        backend=backend,
-        broker=broker,
+        backend=backend_string,
+        broker=broker_string,
         include=["app.api.sentiment.tasks"],
     )
 
