@@ -1,13 +1,6 @@
-import redis
-
-from flask import current_app
-
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
-
-
-# from rq import Queue
 
 
 def get_all_sentiments():
@@ -46,7 +39,7 @@ def remove_sentiment(sentiment):
 
 def update_sentiment(sentiment, keyword):
     """
-    Updates a given sentiment with given details and returns an instance of it.
+    celery = Celery(app.name, broker=app.config.get("CELERY_BROKER_URL"))
 
     :param: sentiment
         Sentiment to be updated
@@ -104,15 +97,3 @@ def add_sentiment(keyword, user_id):
 
     update_user_sentiment_quota(user_id)
     return sentiment
-
-
-def add_to_queue(keyword):
-    """
-    Adds a keyword to the queue for the worker to process
-
-    :param: keyword
-        keyword to find sentiment for
-    """
-    queue = redis.Redis.from_url(current_app.config.get("REDIS_URL"))
-
-    queue.publish(current_app.config.get("REDIS_CHANNEL"), keyword)

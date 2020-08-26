@@ -17,7 +17,7 @@ def read_secrets(secret_file_path):
         with open(secret_file_path, "r") as fp:
             secret = fp.readline().strip()
         return secret
-    except FileNotFoundError:
+    except (FileNotFoundError, TypeError):
         return secret_file_path
 
 
@@ -33,8 +33,9 @@ class BaseConfig:
     REFRESH_TOKEN_EXPIRATION = 2592000
     JWT_ENCODE_ALGORITHM = "HS256"
     SENTIMENT_QUOTA_LIMIT = 5
-    REDIS_CHANNEL = "keywords"
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
+    CELERY_BROKER_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
+    CELERY_RESULT_BACKEND = read_secrets(os.getenv("REDIS_URL_FILE"))
 
 
 class DevelopmentConfig(BaseConfig):
@@ -49,6 +50,7 @@ class TestingConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 4
     ACCESS_TOKEN_EXPIRATION = 3
     REFRESH_TOKEN_EXPIRATION = 3
+    CELERY_ALWAYS_EAGER = True
 
 
 class ProductionConfig(BaseConfig):
