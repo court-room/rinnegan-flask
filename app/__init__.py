@@ -21,7 +21,7 @@ def make_celery(app_name=__name__):
     :returns:
         Instance of celery
     """
-    backend = "redis://:rinnegan@redis:6379/0"
+    backend = os.getenv("REDIS_URL")
     broker = backend.replace("0", "1")
 
     return Celery(
