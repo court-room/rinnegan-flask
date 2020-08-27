@@ -12,24 +12,8 @@ networks:
   backend:
     external: true
     name: rinnegan-backend
-  queue:
-    external: true
-    name: "rinnegan-queue"
 
 services:
-  postgres:
-    container_name: rinnegan-postgres
-    image: onlinejudge95/rinnegan-postgres
-    environment:
-      - POSTGRES_USER=rinnegan
-      - POSTGRES_PASSWORD=rinnegan
-    expose:
-      - 5432
-    networks:
-      - database
-    volumes:
-      - data:/var/lib/postgresql/data
-
   worker:
     container_name: rinnegan-worker
     image: rinnegan-worker
