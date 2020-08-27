@@ -6,12 +6,15 @@ volumes:
     name: rinnegan-data
 
 networks:
-  database:
-    external: true
-    name: rinnegan-database
   backend:
     external: true
     name: rinnegan-backend
+  database:
+    external: true
+    name: rinnegan-database
+  queue:
+    external: true
+    name: rinnegan-queue
 
 services:
   worker:
@@ -39,6 +42,7 @@ services:
     networks:
       - backend
       - database
+      - queue
     ports:
       - 5000:5000
     volumes:
