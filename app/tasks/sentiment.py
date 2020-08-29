@@ -6,6 +6,7 @@ import os
 from tweepy import API
 from tweepy import AppAuthHandler
 from tweepy import Cursor
+from tweepy.parsers import JSONParser
 
 from app import factory
 
@@ -34,7 +35,7 @@ def start_analysis(keyword):
         app.config.get("TWITTER_CONSUMER_SECRET"),
     )
 
-    api = API(auth_wallet)
+    api = API(auth_wallet, parser=JSONParser())
 
     now = datetime.datetime.today() - datetime.timedelta(days=1)
     until = now.strftime("%Y-%m-%d")
@@ -45,7 +46,7 @@ def start_analysis(keyword):
         1000
     ):
         count += 1
-        tweets.append(tweet._json)
+        tweets.append(tweet)
 
         if count == 100:
             count = 0
