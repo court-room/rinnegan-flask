@@ -47,7 +47,9 @@ class SentimentList(Resource):
         if not is_user_sentiment_quota_exhausted(user_id):
             sentiment = add_sentiment(keyword, user_id)
 
-            job = current_app.task_queue.enqueue("app.tasks.sentiment.start_analysis", "Hello world!")
+            job = current_app.task_queue.enqueue(
+                "app.tasks.sentiment.start_analysis", "Hello world!"
+            )
 
             response["id"] = sentiment.id
             response["message"] = f"{keyword} was added"

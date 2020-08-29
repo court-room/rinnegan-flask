@@ -24,7 +24,9 @@ def create_app(environemnt):
     app = Flask(__name__)
     app.config.from_object(cfg_map[environemnt])
     app.redis = Redis.from_url(app.config.get("REDIS_URL"))
-    app.task_queue = Queue(app.config.get("REDIS_QUEUE_NAME"), connection=app.redis)
+    app.task_queue = Queue(
+        app.config.get("REDIS_QUEUE_NAME"), connection=app.redis
+    )
 
     from app import bcrypt
     from app import cors
