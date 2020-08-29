@@ -1,11 +1,13 @@
 from flask import abort
 from flask import Flask
 from flask import request
+from redis import Redis
+from rq import Queue
 
 from app.config import cfg_map
 
 
-def create_app(environemnt, celery):
+def create_app(environemnt):
     """
     App factory for the server.
 
@@ -21,9 +23,12 @@ def create_app(environemnt, celery):
     """
     app = Flask(__name__)
     app.config.from_object(cfg_map[environemnt])
+    app.redis = Redis.from_url(app.config.get("REDIS_URL"))
+    app.task_queue = Queue(
+        app.config.get("REDIS_QUEUE_NAME"), connection=app.redis
+    )
 
     from app import bcrypt
-    from app import celery
     from app import cors
     from app import db
     from app import migrate
@@ -32,8 +37,6 @@ def create_app(environemnt, celery):
     cors.init_app(app, resources={r"/*": {"origins": "*"}})
     bcrypt.init_app(app)
     migrate.init_app(app, db)
-
-    init_celery(celery, app)
 
     from app.api import api
 
@@ -62,24 +65,3 @@ def create_app(environemnt, celery):
                     )
 
     return app
-
-
-def init_celery(celery, app):
-    """
-    Utility function to initialize the celery app,
-    to use the flask app settings.
-
-    :param: celery
-        Instance of celery app to initialize
-    :param: app
-        Instance of flask app to add configs from
-    """
-    celery.conf.update(app.config)
-    TaskBase = celery.Task
-
-    class ContextTask(TaskBase):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-
-    celery.Task = ContextTask

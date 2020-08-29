@@ -1,7 +1,3 @@
-from app import celery
-
-
-@celery.task
 def start_analysis(keyword):
     """
     Adds a keyword to the queue for the worker to process
