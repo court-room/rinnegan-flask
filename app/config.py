@@ -36,7 +36,9 @@ class BaseConfig:
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
     REDIS_QUEUE_NAME = "rinnegan"
     TWITTER_CONSUMER_KEY = read_secrets(os.getenv("TWITTER_CONSUMER_KEY"))
-    TWITTER_CONSUMER_SECRET = read_secrets(os.getenv("TWITTER_CONSUMER_SECRET"))
+    TWITTER_CONSUMER_SECRET = read_secrets(
+        os.getenv("TWITTER_CONSUMER_SECRET")
+    )
 
 
 class DevelopmentConfig(BaseConfig):

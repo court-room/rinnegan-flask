@@ -48,7 +48,7 @@ class SentimentList(Resource):
             sentiment = add_sentiment(keyword, user_id)
 
             job = current_app.task_queue.enqueue(
-                "app.tasks.sentiment.start_analysis", "Hello world!"
+                "app.tasks.sentiment.start_analysis", keyword, job_timeout="5h"
             )
             logging.info(f"Job Id for analysing {keyword} is {job.get_id()}")
 
@@ -59,7 +59,9 @@ class SentimentList(Resource):
             return response, 202
 
         logger.info(f"User {user_id} has exhausted the quota for keywords")
-        response["message"] = """
+        response[
+            "message"
+        ] = """
         Sorry!! You have exhausted the quota for keywords.
         Please remove some of the existing ones to continue.
         """

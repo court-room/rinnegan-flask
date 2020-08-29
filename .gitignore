@@ -11,3 +11,5 @@ Pipfile.lock
 
 # IDE files
 .vscode/
+
+tweets.json
