@@ -41,16 +41,18 @@ def start_analysis(keyword):
 
     count = 0
     tweets = []
-    for tweet in Cursor(api.search, q=keyword, lang="en", until=until).items(1000):
+    for tweet in Cursor(api.search, q=keyword, lang="en", until=until).items(
+        1000
+    ):
         count += 1
         tweets.append(tweet._json)
-        
+
         if count == 100:
             count = 0
-        
+
             with open("tweets.json", "a") as fp:
                 json.dump(tweets, fp)
-        
+
             tweets = []
 
     logger.info(f"Ending {keyword}")
