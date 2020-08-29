@@ -35,6 +35,8 @@ class BaseConfig:
     SENTIMENT_QUOTA_LIMIT = 5
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
     REDIS_QUEUE_NAME = "rinnegan"
+    TWITTER_CONSUMER_KEY = read_secrets(os.getenv("TWITTER_CONSUMER_KEY"))
+    TWITTER_CONSUMER_SECRET = read_secrets(os.getenv("TWITTER_CONSUMER_SECRET"))
 
 
 class DevelopmentConfig(BaseConfig):
@@ -50,6 +52,8 @@ class TestingConfig(BaseConfig):
     ACCESS_TOKEN_EXPIRATION = 3
     REFRESH_TOKEN_EXPIRATION = 3
     REDIS_URL = "redis://"
+    TWITTER_CONSUMER_KEY = "dummy"
+    TWITTER_CONSUMER_SECRET = "dummy"
 
 
 class ProductionConfig(BaseConfig):
