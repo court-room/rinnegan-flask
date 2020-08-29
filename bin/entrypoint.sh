@@ -11,5 +11,5 @@ if [ $NODE_TYPE == "server" ]; then
         flask run --host 0.0.0.0
     fi
 else
-    celery worker -A app.celery --loglevel INFO
+    rq worker --url redis://:rinnegan@redis:6379/0 rinnegan
 fi

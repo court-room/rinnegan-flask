@@ -34,8 +34,7 @@ class BaseConfig:
     JWT_ENCODE_ALGORITHM = "HS256"
     SENTIMENT_QUOTA_LIMIT = 5
     REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
-    CELERY_BROKER_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
-    CELERY_RESULT_BACKEND = read_secrets(os.getenv("REDIS_URL_FILE"))
+    REDIS_QUEUE_NAME = "rinnegan"
 
 
 class DevelopmentConfig(BaseConfig):
@@ -50,7 +49,6 @@ class TestingConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 4
     ACCESS_TOKEN_EXPIRATION = 3
     REFRESH_TOKEN_EXPIRATION = 3
-    CELERY_ALWAYS_EAGER = True
 
 
 class ProductionConfig(BaseConfig):

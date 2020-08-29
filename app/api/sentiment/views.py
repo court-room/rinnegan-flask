@@ -1,5 +1,6 @@
 import logging
 
+from flask import current_app
 from flask import request
 from flask_restx import Resource
 from jwt import ExpiredSignatureError
@@ -16,7 +17,6 @@ from app.api.sentiment.crud import update_sentiment
 from app.api.sentiment.serializers import sentiment_namespace
 from app.api.sentiment.serializers import sentiment_schema
 from app.api.sentiment.serializers import update_sentiment_schema
-from app.api.sentiment.tasks import start_analysis
 from app.api.users.crud import get_user_by_id
 
 
@@ -47,14 +47,14 @@ class SentimentList(Resource):
         if not is_user_sentiment_quota_exhausted(user_id):
             sentiment = add_sentiment(keyword, user_id)
 
-            task = start_analysis.apply_async(args=[keyword])
+            job = current_app.task_queue.enqueue("app.tasks.sentiment.start_analysis", "Hello world!")
 
             response["id"] = sentiment.id
             response["message"] = f"{keyword} was added"
-
-            headers = {"Location": f"/api/sentiment/status/{task.id}"}
+            headers = {"Location": job.get_id()}
             logger.info(f"Sentiment for {keyword} added successfully")
-            return response, 202, headers
+            # return response, 202, headers
+            return response, 202
 
         logger.info(f"User {user_id} has exhausted the quota for keywords")
         response[
