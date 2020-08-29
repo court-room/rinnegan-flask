@@ -51,9 +51,8 @@ class SentimentList(Resource):
 
             response["id"] = sentiment.id
             response["message"] = f"{keyword} was added"
-            headers = {"Location": job.get_id()}
+            response["job_id"] = job.get_id()
             logger.info(f"Sentiment for {keyword} added successfully")
-            # return response, 202, headers
             return response, 202
 
         logger.info(f"User {user_id} has exhausted the quota for keywords")
