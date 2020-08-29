@@ -8,3 +8,6 @@ __pycache__/
 
 # dependencies
 Pipfile.lock
+
+# IDE files
+.vscode/
