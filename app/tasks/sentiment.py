@@ -35,15 +35,25 @@ class AWSObjectStorageClient:
         self.client.upload_file(local_file_path, self.bucket, s3_file_path)
 
 
-storage_clients = {"aws": AWSObjectStorageClient()}
+_storage_clients = {"aws": AWSObjectStorageClient()}
 
 
-def process_tweets(client, keyword, local_file_path):
+def _process_tweets(client, keyword, local_file_path):
+    """
+    Utility function to fetch tweets from the API, with given filters
+    It stores the tweets in a json file, doing a batch write.
+
+    :param: client
+        Twitter client to fetch data from
+    :param: keyword
+        Keyword provided by the suer to search tweets about
+    :param: local_file_path
+        Absolute path to the json file, to store the data
+    """
     now = datetime.datetime.today() - datetime.timedelta(days=1)
     until = now.strftime("%Y-%m-%d")
 
-    count = 0
-    tweets = []
+    count, tweets = 0, []
 
     for tweet in Cursor(
         client.search, q=keyword, lang="en", until=until
@@ -52,20 +62,25 @@ def process_tweets(client, keyword, local_file_path):
         tweets.append(tweet._json)
 
         if count == 100:
-            count = 0
-
             with open(local_file_path, "a") as fp:
                 json.dump(tweets, fp)
 
-            tweets = []
+            count, tweets = 0, []
 
     with open(local_file_path, "a") as fp:
         json.dump(tweets, fp)
 
 
-def push_to_object_storage(local_file_path):
+def _push_to_object_storage(local_file_path):
+    """
+    Utility function to push the data stored in a local file to a
+    object storage provided by the cloud vendor.
+
+    :param: local_file_path
+        Absolute path to the json file, having the data
+    """
     cloud_vendor = app.config.get("CLOUD_VENDOR")
-    storage_client = storage_clients[cloud_vendor]
+    storage_client = _storage_clients[cloud_vendor]
 
     storage_client.upload(local_file_path)
 
@@ -84,12 +99,12 @@ def start_analysis(keyword, request_id):
         app.config.get("TWITTER_CONSUMER_SECRET"),
     )
 
-    client = API(auth_wallet)
+    twitter_client = API(auth_wallet)
 
     local_file_path = f"/tmp/worker-data/{keyword}-{request_id}.json"
 
-    process_tweets(client, keyword, local_file_path)
+    _process_tweets(twitter_client, keyword, local_file_path)
 
-    push_to_object_storage(local_file_path)
+    _push_to_object_storage(local_file_path)
 
     logger.info(f"Ending {keyword}")
