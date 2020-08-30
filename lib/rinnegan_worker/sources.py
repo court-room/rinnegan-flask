@@ -29,8 +29,8 @@ class TwitterClient(BaseClient):
         super().__init__()
 
         auth_wallet = AppAuthHandler(
-            self.config.get("TWITTER_CONSUMER_KEY"),
-            self.config.get("TWITTER_CONSUMER_SECRET"),
+            self.config.TWITTER_CONSUMER_KEY,
+            self.config.TWITTER_CONSUMER_SECRET,
         )
         self.client = API(auth_wallet)
 

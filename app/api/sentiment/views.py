@@ -52,6 +52,7 @@ class SentimentList(Resource):
                 "keyword": keyword,
                 "request_id": request_id,
                 "source": "twitter",
+                "vendor": "aws",
             }
 
             job = current_app.task_queue.enqueue(
