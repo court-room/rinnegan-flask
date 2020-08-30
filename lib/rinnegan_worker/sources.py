@@ -6,16 +6,12 @@ from tweepy import API
 from tweepy import AppAuthHandler
 from tweepy import Cursor
 
-from lib.rinnegan_worker import config
-
-
-cfg = config.Config()
-
 
 class BaseClient(abc.ABC):
-    def __init__(self):
+    def __init__(self, source):
         self.count = 0
         self.data = []
+        self.config = None
 
     @abc.abstractmethod
     def fetch_data(self, keyword, request_id):
@@ -33,8 +29,8 @@ class TwitterClient(BaseClient):
         super().__init__()
 
         auth_wallet = AppAuthHandler(
-            config.get("TWITTER_CONSUMER_KEY"),
-            config.get("TWITTER_CONSUMER_SECRET"),
+            self.config.get("TWITTER_CONSUMER_KEY"),
+            self.config.get("TWITTER_CONSUMER_SECRET"),
         )
         self.client = API(auth_wallet)
 

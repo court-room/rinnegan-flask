@@ -30,7 +30,7 @@ def start_analysis(params):
         keyword=params["keyword"], request_id=params["request_id"]
     )
 
-    storage_vendor_factory = StorageVendorClientFactory()
+    storage_vendor_factory = StorageVendorClientFactory(params["source"])
     storage_vendor_client = storage_vendor_factory.build_client()
 
     storage_vendor_client.upload(local_file_path=local_file_path)

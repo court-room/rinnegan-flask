@@ -31,3 +31,6 @@ class AWSConfig(BaseConfig):
     AWS_ACCESS_KEY_ID = BaseConfig.read_secrets("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = BaseConfig.read_secrets("AWS_SECRET_ACCESS_KEY")
     S3_BUCKET = BaseConfig.read_secrets("S3_BUCKET")
+
+
+config_map = {"twitter": TwitterConfig(), "aws": AWSConfig()}

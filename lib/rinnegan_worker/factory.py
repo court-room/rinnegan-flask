@@ -1,3 +1,4 @@
+from lib.rinnegan_worker.config import config_map
 from lib.rinnegan_worker.sources import client_map as source_client_map
 from lib.rinnegan_worker.vendors import client_map as vendor_client_map
 
@@ -14,6 +15,7 @@ class SourceClientFactory:
             """
             raise NotImplementedError(error)
 
+        self.client.config = config_map[self.source]
         return self.client
 
 
@@ -29,4 +31,5 @@ class StorageVendorClientFactory:
             """
             raise NotImplementedError(error)
 
+        self.client.config = config_map[self.vendor]
         return self.client
