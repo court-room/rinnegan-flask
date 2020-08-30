@@ -39,6 +39,9 @@ class BaseConfig:
     TWITTER_CONSUMER_SECRET = read_secrets(
         os.getenv("TWITTER_CONSUMER_SECRET")
     )
+    CLOUD_VENDOR = read_secrets(os.getenv("CLOUD_VENDOR"))
+    AWS_ACCESS_KEY_ID = read_secrets(os.getenv("AWS_ACCESS_KEY_ID"))
+    AWS_SECRET_ACCESS_KEY = read_secrets(os.getenv("AWS_SECRET_ACCESS_KEY"))
 
 
 class DevelopmentConfig(BaseConfig):

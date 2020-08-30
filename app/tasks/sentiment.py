@@ -3,6 +3,7 @@ import json
 import logging
 import os
 
+from boto3 import client
 from tweepy import API
 from tweepy import AppAuthHandler
 from tweepy import Cursor
@@ -20,14 +21,63 @@ app = factory.create_app(os.getenv("FLASK_ENV"))
 app.app_context().push()
 
 
-def start_analysis(keyword):
+class AWSObjectStorageClient:
+    def __init__(self):
+        self.bucket = "rinnegan-data"
+        self.client = client(
+            "s3",
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+        )
+
+    def upload(self, local_file_path):
+        s3_file_path = f"keywords-data/{local_file_path.split('/')[-1]}"
+
+        self.client.upload_file(local_file_path, self.bucket, s3_file_path)
+
+
+storage_clients = {"aws": AWSObjectStorageClient()}
+
+
+def process_tweets(client, keyword, local_file_path):
+    now = datetime.datetime.today() - datetime.timedelta(days=1)
+    until = now.strftime("%Y-%m-%d")
+
+    count = 0
+    tweets = []
+
+    for tweet in Cursor(client.search, q=keyword, lang="en", until=until).items(
+        1000
+    ):
+        count += 1
+        tweets.append(tweet._json)
+
+        if count == 100:
+            count = 0
+
+            with open(local_file_path, "a") as fp:
+                json.dump(tweets, fp)
+
+            tweets = []
+    
+    with open(local_file_path, "a") as fp:
+        json.dump(tweets, fp)
+
+
+def push_to_object_storage(local_file_path):
+    cloud_vendor = app.config.get("CLOUD_VENDOR")
+    storage_client = storage_clients[cloud_vendor]
+
+    storage_client.upload(local_file_path)
+
+
+def start_analysis(keyword, request_id):
     """
     Adds a keyword to the queue for the worker to process
 
     :param: keyword
         keyword to find sentiment for
     """
-    # with app.app_context():
     logger.info(f"Starting {keyword}")
 
     auth_wallet = AppAuthHandler(
@@ -35,25 +85,12 @@ def start_analysis(keyword):
         app.config.get("TWITTER_CONSUMER_SECRET"),
     )
 
-    api = API(auth_wallet, parser=JSONParser())
+    client = API(auth_wallet)
 
-    now = datetime.datetime.today() - datetime.timedelta(days=1)
-    until = now.strftime("%Y-%m-%d")
+    local_file_path = f"/tmp/worker-data/{keyword}-{request_id}.json"
 
-    count = 0
-    tweets = []
-    for tweet in Cursor(api.search, q=keyword, lang="en", until=until).items(
-        1000
-    ):
-        count += 1
-        tweets.append(tweet)
+    process_tweets(client, keyword, local_file_path)
 
-        if count == 100:
-            count = 0
-
-            with open("tweets.json", "a") as fp:
-                json.dump(tweets, fp)
-
-            tweets = []
+    push_to_object_storage(local_file_path)
 
     logger.info(f"Ending {keyword}")
