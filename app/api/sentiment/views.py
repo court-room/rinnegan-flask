@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from flask import current_app
 from flask import request
@@ -45,13 +46,19 @@ class SentimentList(Resource):
             return response, 403
 
         if not is_user_sentiment_quota_exhausted(user_id):
-            sentiment = add_sentiment(keyword, user_id)
+            request_id = uuid.uuid4().hex
 
             job = current_app.task_queue.enqueue(
-                "app.tasks.sentiment.start_analysis", "Hello world!"
+                "app.tasks.sentiment.start_analysis",
+                keyword,
+                request_id,
+                job_timeout="5h",
             )
 
-            response["id"] = sentiment.id
+            add_sentiment(keyword, user_id, job.get_id())
+
+            logging.info(f"Job Id for analysing {keyword} is {job.get_id()}")
+
             response["message"] = f"{keyword} was added"
             response["job_id"] = job.get_id()
             logger.info(f"Sentiment for {keyword} added successfully")

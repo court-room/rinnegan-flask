@@ -1,14 +1,110 @@
-def start_analysis(keyword):
+import datetime
+import json
+import logging
+import os
+
+from boto3 import client
+from tweepy import API
+from tweepy import AppAuthHandler
+from tweepy import Cursor
+
+from app import factory
+
+
+log_format_string = "%(asctime)s PID- %(process)d %(levelname)s %(pathname)s %(funcName)s %(lineno)d %(message)s"  # noqa: E501
+
+logging.basicConfig(level=logging.INFO, format=log_format_string)
+logger = logging.getLogger(__name__)
+
+app = factory.create_app(os.getenv("FLASK_ENV"))
+app.app_context().push()
+
+
+class AWSObjectStorageClient:
+    def __init__(self):
+        self.bucket = "rinnegan-data"
+        self.client = client(
+            "s3",
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        )
+
+    def upload(self, local_file_path):
+        s3_file_path = f"keywords-data/{local_file_path.split('/')[-1]}"
+
+        self.client.upload_file(local_file_path, self.bucket, s3_file_path)
+
+
+_storage_clients = {"aws": AWSObjectStorageClient()}
+
+
+def _process_tweets(client, keyword, local_file_path):
+    """
+    Utility function to fetch tweets from the API, with given filters
+    It stores the tweets in a json file, doing a batch write.
+
+    :param: client
+        Twitter client to fetch data from
+    :param: keyword
+        Keyword provided by the suer to search tweets about
+    :param: local_file_path
+        Absolute path to the json file, to store the data
+    """
+    now = datetime.datetime.today() - datetime.timedelta(days=1)
+    until = now.strftime("%Y-%m-%d")
+
+    count, tweets = 0, []
+
+    for tweet in Cursor(
+        client.search, q=keyword, lang="en", until=until
+    ).items(1000):
+        count += 1
+        tweets.append(tweet._json)
+
+        if count == 100:
+            with open(local_file_path, "a") as fp:
+                json.dump(tweets, fp)
+
+            count, tweets = 0, []
+
+    with open(local_file_path, "a") as fp:
+        json.dump(tweets, fp)
+
+
+def _push_to_object_storage(local_file_path):
+    """
+    Utility function to push the data stored in a local file to a
+    object storage provided by the cloud vendor.
+
+    :param: local_file_path
+        Absolute path to the json file, having the data
+    """
+    cloud_vendor = app.config.get("CLOUD_VENDOR")
+    storage_client = _storage_clients[cloud_vendor]
+
+    storage_client.upload(local_file_path)
+
+
+def start_analysis(keyword, request_id):
     """
     Adds a keyword to the queue for the worker to process
 
     :param: keyword
         keyword to find sentiment for
     """
-    print(f"Starting {keyword}")
+    logger.info(f"Starting {keyword}")
 
-    import time
+    auth_wallet = AppAuthHandler(
+        app.config.get("TWITTER_CONSUMER_KEY"),
+        app.config.get("TWITTER_CONSUMER_SECRET"),
+    )
 
-    time.sleep(2)
+    twitter_client = API(auth_wallet)
 
-    print(f"Ending {keyword}")
+    local_file_path = f"/tmp/worker-data/{keyword}-{request_id}.json"
+
+    _process_tweets(twitter_client, keyword, local_file_path)
+
+    _push_to_object_storage(local_file_path)
+
+    logger.info(f"Ending {keyword}")
