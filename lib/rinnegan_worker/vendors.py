@@ -8,7 +8,7 @@ class BaseClient(abc.ABC):
         self.config = None
 
     @abc.abstractmethod
-    def upload(local_file_path):
+    def upload(self, local_file_path):
         pass
 
 

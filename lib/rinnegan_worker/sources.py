@@ -8,7 +8,7 @@ from tweepy import Cursor
 
 
 class BaseClient(abc.ABC):
-    def __init__(self, source):
+    def __init__(self):
         self.count = 0
         self.data = []
         self.config = None
