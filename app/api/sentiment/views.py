@@ -52,10 +52,10 @@ class SentimentList(Resource):
                 "app.tasks.sentiment.start_analysis",
                 keyword,
                 request_id,
-                job_timeout="5h"
+                job_timeout="5h",
             )
 
-            sentiment = add_sentiment(keyword, user_id, job.get_id())
+            add_sentiment(keyword, user_id, job.get_id())
 
             logging.info(f"Job Id for analysing {keyword} is {job.get_id()}")
 

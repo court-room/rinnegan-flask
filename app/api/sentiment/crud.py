@@ -96,4 +96,3 @@ def add_sentiment(keyword, user_id, job_id):
     db.session.commit()
 
     update_user_sentiment_quota(user_id)
-    return sentiment

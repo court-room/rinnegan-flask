@@ -7,7 +7,6 @@ from boto3 import client
 from tweepy import API
 from tweepy import AppAuthHandler
 from tweepy import Cursor
-from tweepy.parsers import JSONParser
 
 from app import factory
 
@@ -27,7 +26,7 @@ class AWSObjectStorageClient:
         self.client = client(
             "s3",
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
         )
 
     def upload(self, local_file_path):
@@ -46,9 +45,9 @@ def process_tweets(client, keyword, local_file_path):
     count = 0
     tweets = []
 
-    for tweet in Cursor(client.search, q=keyword, lang="en", until=until).items(
-        1000
-    ):
+    for tweet in Cursor(
+        client.search, q=keyword, lang="en", until=until
+    ).items(1000):
         count += 1
         tweets.append(tweet._json)
 
@@ -59,7 +58,7 @@ def process_tweets(client, keyword, local_file_path):
                 json.dump(tweets, fp)
 
             tweets = []
-    
+
     with open(local_file_path, "a") as fp:
         json.dump(tweets, fp)
 

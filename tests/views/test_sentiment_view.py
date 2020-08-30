@@ -250,7 +250,7 @@ def test_single_sentiment(test_app, monkeypatch):
     assert response.status_code == 200
 
     data = response.get_json()
-    assert data["id"] == 1
+    assert data["job_id"]
     assert data["user_id"] == 1
     assert data["keyword"] == "test_keyword_one"
 
