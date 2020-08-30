@@ -42,7 +42,9 @@ class Register(Resource):
             )
 
         user = add_user(
-            request_data["username"], email, request_data["password"],
+            request_data["username"],
+            email,
+            request_data["password"],
         )
         logger.info(f"User with email {email} added successfully")
         return user, 201

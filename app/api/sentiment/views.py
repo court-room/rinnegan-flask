@@ -48,16 +48,22 @@ class SentimentList(Resource):
         if not is_user_sentiment_quota_exhausted(user_id):
             request_id = uuid.uuid4().hex
 
+            params = {
+                "keyword": keyword,
+                "request_id": request_id,
+                "source": "twitter",
+            }
+
             job = current_app.task_queue.enqueue(
-                "app.tasks.sentiment.start_analysis",
-                keyword,
-                request_id,
+                "lib.rinnegan_worker.handlers.start_analysis",
+                params,
                 job_timeout="5h",
             )
 
             add_sentiment(keyword, user_id, job.get_id())
 
-            logging.info(f"Job Id for analysing {keyword} is {job.get_id()}")
+            logging.info(f"Job ID for analysing {keyword} is {job.get_id()}")
+            logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
 
             response["message"] = f"{keyword} was added"
             response["job_id"] = job.get_id()

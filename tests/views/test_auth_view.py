@@ -7,7 +7,9 @@ from tests import mock_objects
 # Test user registration passes
 def test_user_registration(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+        views,
+        "get_user_by_email",
+        mock_objects.get_no_user_by_email,
     )
 
     monkeypatch.setattr(views, "add_user", mock_objects.add_user)
@@ -130,7 +132,9 @@ def test_user_registration_invalid_header(test_app):
 # Test user login passes
 def test_user_login(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_object_by_email,
+        views,
+        "get_user_by_email",
+        mock_objects.get_user_object_by_email,
     )
     monkeypatch.setattr(views, "add_token", mock_objects.add_token)
     monkeypatch.setattr(
@@ -159,7 +163,9 @@ def test_user_login(test_app, monkeypatch):
 # Test user login fails due to wrong password
 def test_user_login_wrong_password(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_user_by_email,
+        views,
+        "get_user_by_email",
+        mock_objects.get_user_by_email,
     )
     monkeypatch.setattr(
         views, "password_matches", mock_objects.password_not_matches
@@ -185,7 +191,9 @@ def test_user_login_wrong_password(test_app, monkeypatch):
 # Test user login fails due to unregistered user
 def test_user_login_unregistered_user(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_by_email", mock_objects.get_no_user_by_email,
+        views,
+        "get_user_by_email",
+        mock_objects.get_no_user_by_email,
     )
     client = test_app.test_client()
     response = client.post(
@@ -232,7 +240,9 @@ def test_user_login_invalid_header(test_app):
 # Test refresh token passes
 def test_refresh_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
     monkeypatch.setattr(views, "update_token", mock_objects.update_token)
 

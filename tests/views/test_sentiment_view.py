@@ -145,7 +145,9 @@ def test_add_sentiment_invalid_header(test_app):
 # Test fetching sentiment list passes
 def test_get_sentiments(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
     monkeypatch.setattr(
         views, "get_all_sentiments", mock_objects.get_all_sentiments
@@ -231,7 +233,9 @@ def test_get_sentiments_invalid_token(test_app, monkeypatch):
 # Test fetching single sentiment passes
 def test_single_sentiment(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -257,7 +261,9 @@ def test_single_sentiment(test_app, monkeypatch):
 # Test fetching single sentiment fails due to incorrect id
 def test_single_sentiment_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -350,7 +356,9 @@ def test_single_sentiment_invalid_token(test_app, monkeypatch):
 # Test removing a sentiment passes
 def test_remove_sentiment(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -375,7 +383,9 @@ def test_remove_sentiment(test_app, monkeypatch):
 # Test removing a sentiment fails due to incorrect id
 def test_remove_sentiment_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -468,7 +478,9 @@ def test_remove_sentiment_invalid_token(test_app, monkeypatch):
 # Test update a sentiment passes
 def test_update_sentiment(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -500,7 +512,9 @@ def test_update_sentiment(test_app, monkeypatch):
 # Test update a sentiment fails due to empty data
 def test_update_sentiment_empty_data(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     client = test_app.test_client()
@@ -524,7 +538,9 @@ def test_update_sentiment_empty_data(test_app, monkeypatch):
 # Test update a sentiment fails due to invalid id
 def test_update_sentiment_invalid_id(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
@@ -575,7 +591,9 @@ def test_update_sentiment_invalid_headers(test_app):
 # Test update a sentiment fails due to missing token
 def test_update_sentiment_missing_token(test_app, monkeypatch):
     monkeypatch.setattr(
-        views, "get_user_id_by_token", mock_objects.get_user_id_by_token,
+        views,
+        "get_user_id_by_token",
+        mock_objects.get_user_id_by_token,
     )
 
     monkeypatch.setattr(
