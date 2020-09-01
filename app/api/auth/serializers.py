@@ -28,8 +28,7 @@ login_user = auth_namespace.model(
     },
 )
 refresh = auth_namespace.model(
-    "Refresh",
-    {"refresh_token": fields.String(required=True)},
+    "Refresh", {"refresh_token": fields.String(required=True)},
 )
 access_token = auth_namespace.model(
     "Access", {"access_token": fields.String(required=True)}
