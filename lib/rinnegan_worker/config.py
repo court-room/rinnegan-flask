@@ -20,25 +20,22 @@ class BaseConfig:
                 secret = fp.readline().strip()
             return secret
         except (FileNotFoundError, TypeError):
-            return secret_file_path
+            return os.getenv(secret_file_path)
 
 
 class TwitterConfig(BaseConfig):
-    # TWITTER_CONSUMER_KEY = BaseConfig.read_secrets("TWITTER_CONSUMER_KEY")
-    # TWITTER_CONSUMER_SECRET = BaseConfig.read_secrets(
-    #     "TWITTER_CONSUMER_SECRET"
-    # )
-    TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
-    TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
+    TWITTER_CONSUMER_KEY = BaseConfig.read_secrets("TWITTER_CONSUMER_KEY_FILE")
+    TWITTER_CONSUMER_SECRET = BaseConfig.read_secrets(
+        "TWITTER_CONSUMER_SECRET_FILE"
+    )
 
 
 class AWSConfig(BaseConfig):
-    # AWS_ACCESS_KEY_ID = BaseConfig.read_secrets("AWS_ACCESS_KEY_ID")
-    # AWS_SECRET_ACCESS_KEY = BaseConfig.read_secrets("AWS_SECRET_ACCESS_KEY")
-    # S3_BUCKET = BaseConfig.read_secrets("S3_BUCKET")
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    S3_BUCKET = "rinnegan-data"
+    AWS_ACCESS_KEY_ID = BaseConfig.read_secrets("AWS_ACCESS_KEY_ID_FILE")
+    AWS_SECRET_ACCESS_KEY = BaseConfig.read_secrets(
+        "AWS_SECRET_ACCESS_KEY_FILE"
+    )
+    S3_BUCKET = BaseConfig.read_secrets("S3_BUCKET_FILE")
 
 
 config_map = {"twitter": TwitterConfig, "aws": AWSConfig}
