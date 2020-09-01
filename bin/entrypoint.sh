@@ -11,6 +11,6 @@ if [ $NODE_TYPE == "server" ]; then
         flask run --host 0.0.0.0
     fi
 else
-    mkdir -p /tmp/worker-data
+    mkdir -p /usr/src/app/data/worker-data
     rq worker --url redis://:rinnegan@redis:6379/0 rinnegan
 fi

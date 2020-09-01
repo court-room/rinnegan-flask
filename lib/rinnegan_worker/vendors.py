@@ -4,8 +4,8 @@ from boto3 import client
 
 
 class BaseClient(abc.ABC):
-    def __init__(self):
-        self.config = None
+    def __init__(self, config_obj):
+        self.config = config_obj
 
     @abc.abstractmethod
     def upload(self, local_file_path):
@@ -13,8 +13,8 @@ class BaseClient(abc.ABC):
 
 
 class AWSS3Client(BaseClient):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, config):
+        super().__init__(config)
         self.client = client(
             "s3",
             aws_access_key_id=self.config.AWS_ACCESS_KEY_ID,
@@ -34,4 +34,4 @@ class AzureObjectStorageClient(BaseClient):
         pass
 
 
-client_map = {"aws": AWSS3Client(), "azure": AzureObjectStorageClient()}
+client_map = {"aws": AWSS3Client, "azure": AzureObjectStorageClient}

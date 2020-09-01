@@ -1,35 +1,38 @@
+import abc
+import sys
+
 from lib.rinnegan_worker.config import config_map
 from lib.rinnegan_worker.sources import client_map as source_client_map
 from lib.rinnegan_worker.vendors import client_map as vendor_client_map
 
 
-class SourceClientFactory:
-    def __init__(self, source):
-        self.source = source
-        self.client = source_client_map.get(source, None)
+class BaseFactory(abc.ABC):
+    @abc.abstractstaticmethod
+    def build_client(source):
+        pass
 
-    def build_client(self):
-        if not self.client:
+
+class SourceClientFactory(BaseFactory):
+    @staticmethod
+    def build_client(source):
+        client = source_client_map.get(source, None)
+        if not client:
             error = f"""
-            Following source:- {self.source} is not integrated with rinnegan
+            Following source:- {source} is not integrated with rinnegan
             """
             raise NotImplementedError(error)
 
-        self.client.config = config_map[self.source]
-        return self.client
+        return client(config_map[source]())
 
 
-class StorageVendorClientFactory:
-    def __init__(self, vendor):
-        self.vendor = vendor
-        self.client = vendor_client_map.get(vendor, None)
-
-    def build_client(self):
-        if not self.client:
+class StorageVendorClientFactory(BaseFactory):
+    @staticmethod
+    def build_client(vendor):
+        client = vendor_client_map.get(vendor, None)
+        if not client:
             error = f"""
-            Following vendor:- {self.vendor} is not integrated with rinnegan
+            Following vendor:- {vendor} is not integrated with rinnegan
             """
             raise NotImplementedError(error)
 
-        self.client.config = config_map[self.vendor]
-        return self.client
+        return client(config_map[vendor]())
