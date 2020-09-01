@@ -1,5 +1,4 @@
 import abc
-import sys
 
 from lib.rinnegan_worker.config import config_map
 from lib.rinnegan_worker.sources import client_map as source_client_map

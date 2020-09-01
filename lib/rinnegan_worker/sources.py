@@ -44,7 +44,7 @@ class TwitterClient(BaseClient):
 
         for tweet in Cursor(
             self.client.search, q=keyword, lang="en", until=until
-        ).items(10):
+        ).items(1000):
             self.count += 1
             self.data.append(tweet._json)
 
