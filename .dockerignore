@@ -2,6 +2,7 @@
 .github/
 .pytest_cache/
 .vscode/
+data/
 tests/
 
 .coveragerc
