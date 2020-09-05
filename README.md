@@ -6,51 +6,33 @@
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/court-room/rinnegan-flask/?ref=repository-badge)
 [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=court-room/rinnegan-flask)](https://dependabot.com)
 
-## Pre-Requisite
-
-Run the following commands for setting up the dependencies of your server
-
-- Create the networks with the given name
-
-  ```bash
-  $ docker network create --attachable rinnegan-database
-  $ docker network create --attachable rinnegan-backend
-  ```
-
-- Create a volume with the given name
-
-  ```bash
-  $ docker volume create rinnegan-data
-  ```
-
-## Setup
-
-The server can be used for locally testing the client or the entire set of services.
-In order to use the server you need a dependency on the database, which is defined in the compsoe file.
-
-- Make sure you have a copy of `.env` file created by using `.env.example` as a template
-
-- Build the image
-
-  ```bash
-  $ docker-compose build --compress
-  ```
-
-- Launch the container
-
-  ```bash
-  $ docker-compose up --detach
-  ```
-
 ## Development
 
-- In order to verify that the container is up
+The server can be used for locally testing the client or the entire set of services.
+In order to use the server you need to follow certain steps
 
-```bash
-$ docker container ls
-```
+- Build the image locally
 
-- To open the Swagger API Explorer please open a browser and go to `http://localhost:5000`
+  ```bash
+  $ docker build  --compress --force-rm --tag rinnegan-flask:latest .
+  ```
+
+- Tag the latest image to local registry format
+
+  ```bash
+  $ docker image tag rinnegan-flask:latest localhost:6000/rinnegan-flask:latest
+  ```
+
+- Push the image to the registry
+
+  ```bash
+  $ docker push localhost:6000/rinnegan-flask:latest
+  ```
+
+_OPTIONAL_
+
+There is a shell script at `bin/build.sh` that handles the image build,
+tagging and pushing it to the local registry.
 
 ## Contact
 
