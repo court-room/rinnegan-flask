@@ -25,10 +25,6 @@ class BaseClient(abc.ABC):
 class TwitterClient(BaseClient):
     def __init__(self, config_obj):
         super().__init__(config_obj)
-
-        import sys
-        print(self.config.TWITTER_CONSUMER_KEY, file=sys.stderr)
-
         auth_wallet = AppAuthHandler(
             self.config.TWITTER_CONSUMER_KEY,
             self.config.TWITTER_CONSUMER_SECRET,
