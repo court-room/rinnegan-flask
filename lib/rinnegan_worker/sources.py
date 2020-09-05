@@ -46,6 +46,8 @@ class TwitterClient(BaseClient):
             self.client.search, q=keyword, lang="en", until=until
         ).items(1000):
             self.count += 1
+
+            # skipcq: PYL-W0212
             self.data.append(tweet._json)
 
             if self.count == 100:
