@@ -11,7 +11,8 @@ if [ $NODE_TYPE == "server" ]; then
         export NEW_RELIC_LICENSE_KEY=`cat $NEW_RELIC_LICENSE_KEY_FILE`
         export NEW_RELIC_APP_NAME=`cat $NEW_RELIC_APP_NAME_FILE`
         
-        newrelic-admin run-program gunicorn --config gunicorn.conf.py manage:app
+        newrelic-admin run-program
+        gunicorn --config gunicorn.conf.py manage:app
     else
         echo "Running the single threaded flask server"
         flask run --host 0.0.0.0
