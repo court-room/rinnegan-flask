@@ -8,10 +8,13 @@ if [ $NODE_TYPE == "server" ]; then
     if [ $FLASK_ENV != "development" ]; then
         echo "Running Gunicorn with eventlet workers"
         
-        export NEW_RELIC_LICENSE_KEY=`cat $NEW_RELIC_LICENSE_KEY_FILE`
-        export NEW_RELIC_APP_NAME=`cat $NEW_RELIC_APP_NAME_FILE`
+        NEW_RELIC_LICENSE_KEY=`cat $NEW_RELIC_LICENSE_KEY_FILE`
+        NEW_RELIC_APP_NAME=`cat $NEW_RELIC_APP_NAME_FILE`
         
-        newrelic-admin run-program
+        sed -i -e "s/LICENSE_KEY_PLACEHOLDER/${NEW_RELIC_LICENSE_KEY}/g" newrelic.ini
+        sed -i -e "s/APP_NAME_PLACEHOLDER/${NEW_RELIC_APP_NAME}/g" newrelic.ini
+        
+        NEW_RELIC_CONFIG_FILE=newrelic.ini  newrelic-admin run-program
         gunicorn --config gunicorn.conf.py manage:app
     else
         echo "Running the single threaded flask server"
