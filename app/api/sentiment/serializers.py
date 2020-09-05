@@ -10,7 +10,7 @@ parser.add_argument("Authorization", location="headers")
 sentiment_schema = sentiment_namespace.model(
     "Sentiment",
     {
-        "id": fields.Integer(readOnly=True),
+        "job_id": fields.Integer(readOnly=True),
         "user_id": fields.Integer(required=True),
         "keyword": fields.String(required=True),
     },

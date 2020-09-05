@@ -170,3 +170,7 @@ def update_sentiment(sentiment, keyword):
     mock_sentiment = Sentiment()
     mock_sentiment.update({"id": 1, "keyword": keyword, "user_id": 1})
     return mock_sentiment
+
+
+def add_to_queue(keyword):
+    pass

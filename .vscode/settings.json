@@ -1,7 +1,0 @@
-{
-  "files.autoSave": "off",
-  "files.insertFinalNewline": true,
-  "python.formatting.blackPath": "~/.local/share/virtualenvs/rinnegan-flask-EyLpHBIN/bin/black",
-  "python.formatting.blackArgs": ["--config", "pyproject.toml", "."],
-  "python.formatting.provider": "black"
-}

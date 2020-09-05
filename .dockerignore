@@ -2,12 +2,12 @@
 .github/
 .pytest_cache/
 .vscode/
+data/
 tests/
 
 .coveragerc
 .deepsource.toml
 .dockerignore
-.env.example
 .gitignore
 .pep8speaks.yml
 docker-compose.yml

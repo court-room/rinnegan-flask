@@ -1,5 +1,4 @@
 # environments
-.env
 env/
 
 # caches
@@ -8,3 +7,8 @@ __pycache__/
 
 # dependencies
 Pipfile.lock
+
+# IDE files
+.vscode/
+
+data/

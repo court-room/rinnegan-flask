@@ -17,7 +17,7 @@ def read_secrets(secret_file_path):
         with open(secret_file_path, "r") as fp:
             secret = fp.readline().strip()
         return secret
-    except FileNotFoundError:
+    except (FileNotFoundError, TypeError):
         return secret_file_path
 
 
@@ -33,6 +33,11 @@ class BaseConfig:
     REFRESH_TOKEN_EXPIRATION = 2592000
     JWT_ENCODE_ALGORITHM = "HS256"
     SENTIMENT_QUOTA_LIMIT = 5
+    REDIS_URL = read_secrets(os.getenv("REDIS_URL_FILE"))
+    REDIS_QUEUE_NAME = "rinnegan"
+    CLOUD_VENDOR = read_secrets(os.getenv("CLOUD_VENDOR"))
+    AWS_ACCESS_KEY_ID = read_secrets(os.getenv("AWS_ACCESS_KEY_ID"))
+    AWS_SECRET_ACCESS_KEY = read_secrets(os.getenv("AWS_SECRET_ACCESS_KEY"))
 
 
 class DevelopmentConfig(BaseConfig):
@@ -41,11 +46,15 @@ class DevelopmentConfig(BaseConfig):
 
 
 class TestingConfig(BaseConfig):
+    REDIS_URL = "placeholder"
     JSON_SORT_KEYS = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL_FILE")
     BCRYPT_LOG_ROUNDS = 4
     ACCESS_TOKEN_EXPIRATION = 3
     REFRESH_TOKEN_EXPIRATION = 3
+    REDIS_URL = "redis://"
+    TWITTER_CONSUMER_KEY = "dummy"
+    TWITTER_CONSUMER_SECRET = "dummy"
 
 
 class ProductionConfig(BaseConfig):

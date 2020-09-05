@@ -1,25 +1,6 @@
 from app import db
 from app.api.sentiment.models import Sentiment
-from app.api.users.crud import update_user_sentiment_quota
-
-
-def add_sentiment(keyword, user_id):
-    """
-    Adds a sentiment with given details and returns an instance of it.
-
-    :param: keyword
-        keyword to find sentiment for
-    :param: user_id
-        Id of the user
-    :returns:
-        Sentiment with given details
-    """
-    sentiment = Sentiment(keyword=keyword, user_id=user_id)
-    db.session.add(sentiment)
-    db.session.commit()
-
-    update_user_sentiment_quota(user_id)
-    return sentiment
+from app.api.users.crud import get_user_by_id
 
 
 def get_all_sentiments():
@@ -58,7 +39,7 @@ def remove_sentiment(sentiment):
 
 def update_sentiment(sentiment, keyword):
     """
-    Updates a given sentiment with given details and returns an instance of it.
+    celery = Celery(app.name, broker=app.config.get("CELERY_BROKER_URL"))
 
     :param: sentiment
         Sentiment to be updated
@@ -70,3 +51,48 @@ def update_sentiment(sentiment, keyword):
     sentiment.keyword = keyword
     db.session.commit()
     return sentiment
+
+
+def is_user_sentiment_quota_exhausted(user_id):
+    """
+    Utility method to find if user has exhausted their
+    sentiment quota for keyword analysis
+
+    :param: user_id
+        ID of the user
+    :returns:
+        Status of quota
+    """
+    user = get_user_by_id(user_id)
+
+    return user.sentiment_quota < 0
+
+
+def update_user_sentiment_quota(user_id):
+    """
+    Utility method to update sentiment quota for a user
+
+    :param: user_id
+    """
+    user = get_user_by_id(user_id)
+
+    user.sentiment_quota -= 1
+    db.session.commit()
+
+
+def add_sentiment(keyword, user_id, job_id):
+    """
+    Adds a sentiment with given details and returns an instance of it.
+
+    :param: keyword
+        keyword to find sentiment for
+    :param: user_id
+        Id of the user
+    :returns:
+        Sentiment with given details
+    """
+    sentiment = Sentiment(keyword=keyword, user_id=user_id, job_id=job_id)
+    db.session.add(sentiment)
+    db.session.commit()
+
+    update_user_sentiment_quota(user_id)

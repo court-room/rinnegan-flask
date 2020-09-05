@@ -1,5 +1,7 @@
 import logging
+import uuid
 
+from flask import current_app
 from flask import request
 from flask_restx import Resource
 from jwt import ExpiredSignatureError
@@ -10,13 +12,13 @@ from app.api.auth.serializers import parser
 from app.api.sentiment.crud import add_sentiment
 from app.api.sentiment.crud import get_all_sentiments
 from app.api.sentiment.crud import get_sentiment_by_id
+from app.api.sentiment.crud import is_user_sentiment_quota_exhausted
 from app.api.sentiment.crud import remove_sentiment
 from app.api.sentiment.crud import update_sentiment
 from app.api.sentiment.serializers import sentiment_namespace
 from app.api.sentiment.serializers import sentiment_schema
 from app.api.sentiment.serializers import update_sentiment_schema
 from app.api.users.crud import get_user_by_id
-from app.api.users.crud import is_user_sentiment_quota_exhausted
 
 
 logger = logging.getLogger(__name__)
@@ -44,12 +46,30 @@ class SentimentList(Resource):
             return response, 403
 
         if not is_user_sentiment_quota_exhausted(user_id):
-            sentiment = add_sentiment(keyword, user_id)
+            request_id = uuid.uuid4().hex
 
-            response["id"] = sentiment.id
+            params = {
+                "keyword": keyword,
+                "request_id": request_id,
+                "source": "twitter",
+                "vendor": "aws",
+            }
+
+            job = current_app.task_queue.enqueue(
+                "lib.rinnegan_worker.handlers.start_analysis",
+                params,
+                job_timeout="5h",
+            )
+
+            add_sentiment(keyword, user_id, job.get_id())
+
+            logging.info(f"Job ID for analysing {keyword} is {job.get_id()}")
+            logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
+
             response["message"] = f"{keyword} was added"
+            response["job_id"] = job.get_id()
             logger.info(f"Sentiment for {keyword} added successfully")
-            return response, 201
+            return response, 202
 
         logger.info(f"User {user_id} has exhausted the quota for keywords")
         response[

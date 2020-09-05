@@ -77,6 +77,7 @@ jobs:
           SECRET_KEY_FILE: NOT_SO_SECRET_KEY_FOR_TEST
           DATABASE_URL_FILE: DUMMY_DATABASE_URL
           DATABASE_TEST_URL_FILE: DUMMY_DATABASE_TEST_URL
+          REDIS_URL_FILE: DUMMY_REDIS_URL
         run: |
           pytest -c tests/pytest.ini
 
