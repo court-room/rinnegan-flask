@@ -1,7 +1,8 @@
 #!/bin/sh
 
 clear
-docker-compose build --compress --force-rm
+
+docker build  --compress --force-rm --tag rinnegan-flask:latest .
 
 docker image tag rinnegan-flask:latest localhost:6000/rinnegan-flask:latest
 
