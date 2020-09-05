@@ -24,14 +24,18 @@ class BaseConfig:
 
 
 class TwitterConfig(BaseConfig):
-    TWITTER_CONSUMER_KEY = BaseConfig.read_secrets(os.getenv("TWITTER_CONSUMER_KEY_FILE"))
+    TWITTER_CONSUMER_KEY = BaseConfig.read_secrets(
+        os.getenv("TWITTER_CONSUMER_KEY_FILE")
+    )
     TWITTER_CONSUMER_SECRET = BaseConfig.read_secrets(
         os.getenv("TWITTER_CONSUMER_SECRET_FILE")
     )
 
 
 class AWSConfig(BaseConfig):
-    AWS_ACCESS_KEY_ID = BaseConfig.read_secrets(os.getenv("AWS_ACCESS_KEY_ID_FILE"))
+    AWS_ACCESS_KEY_ID = BaseConfig.read_secrets(
+        os.getenv("AWS_ACCESS_KEY_ID_FILE")
+    )
     AWS_SECRET_ACCESS_KEY = BaseConfig.read_secrets(
         os.getenv("AWS_SECRET_ACCESS_KEY_FILE")
     )
