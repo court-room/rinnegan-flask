@@ -1,3 +1,4 @@
+import abc
 import json
 
 from monkeylearn import MonkeyLearn
@@ -21,16 +22,14 @@ class BaseClient(abc.ABC):
 class MonkeyLearnClient(BaseClient):
     def __init__(self, config_obj):
         super().__init__(config_obj)
-        auth_wallet = AppAuthHandler(
-            self.config.TWITTER_CONSUMER_KEY,
-            self.config.TWITTER_CONSUMER_SECRET,
-        )
         self.model_id = self.config.MONKEYLEARN_MODEL_ID
         self.client = MonkeyLearn(self.config.MONKEYLEARN_API_TOKEN)
-    
+
     def _send_request(self, keyword, data):
         if len(data) > 0:
-            response = self.client.classifiers.classify(model_id=self.model_id, data=data)
+            response = self.client.classifiers.classify(
+                model_id=self.model_id, data=data
+            )
             return response.body
 
     def fetch_predictions(self, keyword, data_file_path):
@@ -50,8 +49,8 @@ class MonkeyLearnClient(BaseClient):
         result.append(self._send_request(keyword, batch))
 
         import sys
+
         print(result[0:3], file=sys.stderr)
-            
 
 
 client_map = {"monkeylearn": MonkeyLearnClient}

@@ -1,8 +1,8 @@
 import logging
 
+from lib.rinnegan_worker.factory import NLPModelClientFactory
 from lib.rinnegan_worker.factory import SourceClientFactory
 from lib.rinnegan_worker.factory import StorageVendorClientFactory
-from lib.rinnegan_worker.factory import NLPModelClientFactory
 
 
 log_format_string = "%(asctime)s PID- %(process)d %(levelname)s %(pathname)s %(funcName)s %(lineno)d %(message)s"  # noqa: E501
@@ -27,7 +27,9 @@ def start_analysis(params):
         f"/usr/src/app/data/worker-data/{keyword}-{request_id}.json"
     )
 
-    data_source_client = SourceClientFactory.build_client(params["source"]["data_source"])
+    data_source_client = SourceClientFactory.build_client(
+        params["source"]["data_source"]
+    )
 
     data_source_client.fetch_data(
         keyword=keyword, data_file_path=local_file_path
@@ -43,6 +45,7 @@ def start_analysis(params):
     data = model_client.get_predections()
 
     import sys
+
     print(data, file=sys.stderr)
 
     logger.info(f"Analysis for {keyword} completed")
