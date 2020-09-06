@@ -16,7 +16,7 @@ class BaseClient(abc.ABC):
 
     def load_data(self, data_file_path):
         with open(data_file_path, "r") as fp:
-            self.data = json.load(fp)
+            self.data = [json.loads(line.strip()) for line in fp.readlines()]
 
 
 class MonkeyLearnClient(BaseClient):
