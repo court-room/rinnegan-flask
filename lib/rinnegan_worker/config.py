@@ -51,4 +51,8 @@ class NLPModelConfig(BaseConfig):
     )
 
 
-config_map = {"twitter": TwitterConfig, "aws": AWSConfig, "monkeylearn": NLPModelConfig}
+config_map = {
+    "twitter": TwitterConfig,
+    "aws": AWSConfig,
+    "monkeylearn": NLPModelConfig,
+}
