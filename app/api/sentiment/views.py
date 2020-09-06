@@ -49,10 +49,19 @@ class SentimentList(Resource):
             request_id = uuid.uuid4().hex
 
             params = {
-                "keyword": keyword,
-                "request_id": request_id,
-                "source": "twitter",
-                "vendor": "aws",
+                "keyword": {
+                    "data": keyword
+                },
+                "meta": {
+                    "request_id": request_id,
+                    "model": "monkeylearn"
+                }
+                "source": {
+                    "data_source": "twitter"
+                },
+                "vendor": {
+                    "object_storage_vendor": "aws"
+                },
             }
 
             job = current_app.task_queue.enqueue(
