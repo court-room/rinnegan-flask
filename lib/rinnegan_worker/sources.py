@@ -59,9 +59,4 @@ class TwitterClient(BaseClient):
         self.write_to_json(data_file_path)
 
 
-class FacebookClient(BaseClient):
-    def fetch_data(self, keyword, data_file_path):
-        pass
-
-
-client_map = {"twitter": TwitterClient, "facebook": FacebookClient}
+client_map = {"twitter": TwitterClient}
