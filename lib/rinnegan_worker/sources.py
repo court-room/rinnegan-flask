@@ -21,7 +21,7 @@ class BaseClient(abc.ABC):
         with open(data_file_path, "a") as fp:
             for data in self.data:
                 try:
-                    json.dump(data, fp)
+                    fp.write(f"{json.dumps(data)}\n")
                 except json.decoder.JSONDecodeError:
                     pass
 
