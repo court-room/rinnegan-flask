@@ -19,7 +19,11 @@ class BaseClient(abc.ABC):
 
     def write_to_json(self, data_file_path):
         with open(data_file_path, "a") as fp:
-            json.dump(self.data, fp)
+            for data in self.data:
+                try:
+                    json.dump(data, fp)
+                except json.decoder.JSONDecodeError:
+                    pass
 
 
 class TwitterClient(BaseClient):

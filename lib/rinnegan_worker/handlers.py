@@ -24,7 +24,7 @@ def start_analysis(params):
     logger.info(f"Starting analysis for {keyword}")
 
     local_file_path = (
-        f"/usr/src/app/data/worker-data/{keyword}-{request_id}.json"
+        f"/usr/src/app/data/worker-data/{keyword}-{request_id}.jsonl"
     )
 
     data_source_client = SourceClientFactory.build_client(
@@ -42,7 +42,7 @@ def start_analysis(params):
     storage_vendor_client.upload(local_file_path=local_file_path)
 
     model_client = NLPModelClientFactory.build_client(params["meta"]["model"])
-    data = model_client.get_predections()
+    data = model_client.fetch_predictions(keyword, local_file_path)
 
     import sys
 
