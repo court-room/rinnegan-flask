@@ -42,4 +42,13 @@ class AWSConfig(BaseConfig):
     S3_BUCKET = BaseConfig.read_secrets(os.getenv("S3_BUCKET_FILE"))
 
 
-config_map = {"twitter": TwitterConfig, "aws": AWSConfig}
+class NLPModelConfig(BaseConfig):
+    MONKEYLEARN_API_TOKEN = BaseConfig.read_secrets(
+        os.getenv("MONKEYLEARN_API_TOKEN_FILE")
+    )
+    MONKEYLEARN_MODEL_ID = BaseConfig.read_secrets(
+        os.getenv("MONKEYLEARN_MODEL_ID_FILE")
+    )
+
+
+config_map = {"twitter": TwitterConfig, "aws": AWSConfig, "monkeylearn": NLPModelConfig}
