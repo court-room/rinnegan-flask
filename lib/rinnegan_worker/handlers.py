@@ -1,3 +1,4 @@
+import concurrent.futures
 import logging
 
 from lib.rinnegan_worker.factory import NLPModelClientFactory
@@ -30,22 +31,22 @@ def start_analysis(params):
     data_source_client = SourceClientFactory.build_client(
         params["source"]["data_source"]
     )
+    storage_vendor_client = StorageVendorClientFactory.build_client(
+        params["vendor"]["object_storage_vendor"]
+    )
+    model_client = NLPModelClientFactory.build_client(params["meta"]["model"])
 
     data_source_client.fetch_data(
         keyword=keyword, data_file_path=local_file_path
     )
 
-    storage_vendor_client = StorageVendorClientFactory.build_client(
-        params["vendor"]["object_storage_vendor"]
-    )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        storage_callback = executor.submit(storage_vendor_client.upload, local_file_path=local_file_path)
+        model_callback = executor.submit(model_client.fetch_predictions, keyword, local_file_path)
+        nlp_response = model_callback.result()
 
-    storage_vendor_client.upload(local_file_path=local_file_path)
+        import sys
 
-    model_client = NLPModelClientFactory.build_client(params["meta"]["model"])
-    data = model_client.fetch_predictions(keyword, local_file_path)
-
-    import sys
-
-    print(data, file=sys.stderr)
+        print(nlp_response, file=sys.stderr)
 
     logger.info(f"Analysis for {keyword} completed")

@@ -28,15 +28,22 @@ class MonkeyLearnClient(BaseClient):
     def fetch_predictions(self, keyword, data_file_path):
         self.load_data(data_file_path)
 
-        response = self.client.classifiers.classify(
-            model_id=self.model_id,
-            data=self.data,
-            auto_batch=True,
-            retry_if_throttled=True,
-        )
-        data = {"response": response}
+        # response = self.client.classifiers.classify(
+        #     model_id=self.model_id,
+        #     data=self.data,
+        #     auto_batch=True,
+        #     retry_if_throttled=True,
+        # )
+
+        # data = {"response": response.body}
+        import sys
+        for data in self.data:
+            print(data, file=sys.stderr)
+            break
         with open("data-monkeylearn.json", "w") as fp:
-            json.dump(data, fp)
+            json.dump(self.data, fp)
+        
+        return response.body
 
 
 client_map = {"monkeylearn": MonkeyLearnClient}
