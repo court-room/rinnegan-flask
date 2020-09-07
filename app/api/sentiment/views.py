@@ -54,6 +54,7 @@ class SentimentList(Resource):
                 "source": "twitter",
                 "vendor": "aws",
                 "streaming": "mongo",
+                "nlp": "monkeylearn"
             }
 
             job = current_app.task_queue.enqueue(
