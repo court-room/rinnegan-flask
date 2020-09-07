@@ -24,6 +24,7 @@ PyJWT = "==1.7.1"
 redis = "==3.5.3"
 rq = "==1.5.1"
 tweepy = "==3.9.0"
+joblib = "==0.16.0"
 boto3 = "==1.14.55"
 monkeylearn = "==3.5.2"
 

@@ -47,7 +47,7 @@ class TwitterClient(BaseClient):
 
         for tweet in Cursor(
             self.client.search, q=keyword, lang="en", until=until
-        ).items(1000):
+        ).items(1):
             self.count += 1
 
             # skipcq: PYL-W0212
