@@ -18,7 +18,7 @@ class MongoDBClient(BaseClient):
 
         self.client = MongoClient(self.config.MONGO_URI)
 
-    def start_streaming(self, keyword, data_file_path):
+    def start_streaming(self, keyword, response):
         pass
 
 
