@@ -41,7 +41,7 @@ def start_analysis(params):
     )
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        storage_callback = executor.submit(
+        executor.submit(
             storage_vendor_client.upload, local_file_path=local_file_path
         )
         model_callback = executor.submit(
