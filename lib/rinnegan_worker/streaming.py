@@ -19,11 +19,7 @@ class MongoDBClient(BaseClient):
         self.client = MongoClient(self.config.MONGO_URI)
 
     def start_streaming(self, keyword, data_file_path):
-        with open(data_file_path, "r") as fp:
-            for index, line in enumerate(fp.readlines()):
-                if index == 500:
-                    # Push t
-                    pass
+        pass
 
 
 client_map = {"mongo": MongoDBClient}
