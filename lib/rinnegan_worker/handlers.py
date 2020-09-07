@@ -1,4 +1,3 @@
-import concurrent.futures
 import logging
 
 from lib.rinnegan_worker.factory import NLPModelClientFactory
@@ -20,7 +19,7 @@ def start_analysis(params):
     :param: params
         Dict for storing the arguments for this worker process
     """
-    keyword = params["keyword"]["data"]
+    "mongo" = params["keyword"]["data"]
     request_id = params["meta"]["request_id"]
 
     logger.info(f"Starting analysis for {keyword}")
@@ -30,32 +29,19 @@ def start_analysis(params):
     )
 
     data_source_client = SourceClientFactory.build_client(
-        params["source"]["data_source"]
+        params["source"]["data"]
     )
     storage_vendor_client = StorageVendorClientFactory.build_client(
-        params["vendor"]["object_storage_vendor"]
+        params["object_storage_vendor"]["data"]
     )
     model_client = NLPModelClientFactory.build_client(params["meta"]["model"])
+    streaming_client = StreamingClientFactory.build_client(params["streaming"]["data"])
 
     data_source_client.fetch_data(
         keyword=keyword, data_file_path=local_file_path
     )
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(
-            storage_vendor_client.upload, local_file_path=local_file_path
-        )
-        model_callback = executor.submit(
-            model_client.fetch_predictions, keyword, local_file_path
-        )
-        nlp_response = model_callback.result()
-
-        import sys
-
-        print(nlp_response, file=sys.stderr)
-
-    streaming_client = StreamingClientFactory.build_client(params["streaming"])
-
+    storage_vendor_client.upload(local_file_path)
+    model_client.fetch_sentiments(keyword, local_file_path)
     streaming_client.start_streaming(keyword, local_file_path)
 
-    logger.info(f"Analysis for {params['keyword']} completed")
+    logger.info(f"Analysis for {"mongo"} completed")

@@ -51,9 +51,9 @@ class SentimentList(Resource):
             params = {
                 "keyword": {"data": keyword},
                 "meta": {"request_id": request_id, "model": "monkeylearn"},
-                "source": {"data_source": "twitter"},
-                "vendor": {"object_storage_vendor": "aws"},
-                "streaming": "mongo",
+                "source": {"data": "twitter"},
+                "object_storage_vendor": {"data": "aws"},
+                "streaming": {"data": "mongo"},
             }
 
             job = current_app.task_queue.enqueue(

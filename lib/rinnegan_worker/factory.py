@@ -1,7 +1,7 @@
 import abc
 
 from lib.rinnegan_worker.config import config_map
-from lib.rinnegan_worker.models import client_map as model_client_map
+from lib.rinnegan_worker.model import client_map as model_client_map
 from lib.rinnegan_worker.sources import client_map as source_client_map
 from lib.rinnegan_worker.streaming import client_map as streaming_client_map
 from lib.rinnegan_worker.vendors import client_map as vendor_client_map
