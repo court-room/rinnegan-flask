@@ -2,6 +2,7 @@ import logging
 
 from lib.rinnegan_worker.factory import SourceClientFactory
 from lib.rinnegan_worker.factory import StorageVendorClientFactory
+from lib.rinnegan_worker.factory import StreamingClientFactory
 
 
 log_format_string = "%(asctime)s PID- %(process)d %(levelname)s %(pathname)s %(funcName)s %(lineno)d %(message)s"  # noqa: E501
@@ -37,5 +38,9 @@ def start_analysis(params):
     )
 
     storage_vendor_client.upload(local_file_path=local_file_path)
+
+    streaming_client = StreamingClientFactory.build_client(params["streaming"])
+
+    streaming_client.start_streaming(keyword, local_file_path)
 
     logger.info(f"Analysis for {params['keyword']} completed")

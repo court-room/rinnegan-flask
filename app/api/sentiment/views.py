@@ -53,6 +53,7 @@ class SentimentList(Resource):
                 "request_id": request_id,
                 "source": "twitter",
                 "vendor": "aws",
+                "streaming": "mongo",
             }
 
             job = current_app.task_queue.enqueue(
