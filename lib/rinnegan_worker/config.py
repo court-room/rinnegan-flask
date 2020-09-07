@@ -33,6 +33,7 @@ class TwitterConfig(BaseConfig):
     TWITTER_POST_LIMITS = int(
         BaseConfig.read_secrets(os.getenv("TWITTER_POST_LIMITS_FILE"))
     )
+    TWITTER_POST_SCHEMA = ["text"]
 
 
 class AWSConfig(BaseConfig):
@@ -45,6 +46,15 @@ class AWSConfig(BaseConfig):
     S3_BUCKET = BaseConfig.read_secrets(os.getenv("S3_BUCKET_FILE"))
 
 
+class NLPModelConfig(BaseConfig):
+    MONKEYLEARN_API_TOKEN = BaseConfig.read_secrets(
+        os.getenv("MONKEYLEARN_API_TOKEN_FILE")
+    )
+    MONKEYLEARN_MODEL_ID = BaseConfig.read_secrets(
+        os.getenv("MONKEYLEARN_MODEL_ID_FILE")
+    )
+
+
 class MongoDBClient(BaseConfig):
     MONGO_URI = BaseConfig.read_secrets(os.getenv("MONGO_URI_FILE"))
 
@@ -52,5 +62,6 @@ class MongoDBClient(BaseConfig):
 config_map = {
     "twitter": TwitterConfig,
     "aws": AWSConfig,
+    "monkeylearn": NLPModelConfig,
     "mongo": MongoDBClient,
 }
