@@ -44,7 +44,7 @@ class MonkeyLearnClient(BaseClient):
         with open("data-monkeylearn.json", "w") as fp:
             json.dump(self.data, fp)
 
-        return response.body
+        # return response.body
 
 
 client_map = {"monkeylearn": MonkeyLearnClient}
