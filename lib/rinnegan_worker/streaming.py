@@ -1,5 +1,4 @@
 import abc
-import json
 
 from pymongo import MongoClient
 
@@ -21,13 +20,10 @@ class MongoDBClient(BaseClient):
 
     def start_streaming(self, keyword, data_file_path):
         with open(data_file_path, "r") as fp:
-
-            data = []
             for index, line in enumerate(fp.readlines()):
                 if index == 500:
                     # Push t
                     pass
-
 
 
 client_map = {"mongo": MongoDBClient}
