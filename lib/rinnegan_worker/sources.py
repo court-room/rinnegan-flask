@@ -18,9 +18,13 @@ class BaseClient(abc.ABC):
         pass
 
     def _compactify(self, record):
-        data = json.dumps(data)
-
-        result = {key: data[key] for key in data if key in self.config.TWITTER_POST_SCHEMA}
+        data = json.dumps(record)
+        result = {
+            key: data[key]
+            for key in data
+            if key in self.config.TWITTER_POST_SCHEMA
+        }
+        return result
 
     def write_to_json(self, data_file_path):
         with open(data_file_path, "a") as fp:
