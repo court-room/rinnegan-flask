@@ -35,14 +35,14 @@ class TwitterClient(BaseClient):
             self.config.TWITTER_CONSUMER_SECRET,
         )
         self.client = API(auth_wallet)
-    
+
     def _compactify(self, record):
         result = {}
 
         for key in self.config.TWITTER_POST_SCHEMA:
             if key in record:
                 result[key] = record[key]
-        
+
         return result
 
     def write_to_json(self, data_file_path):
