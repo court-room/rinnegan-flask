@@ -17,6 +17,10 @@ class MongoDBClient(BaseClient):
         super().__init__(config_obj)
 
         self.client = MongoClient(self.config.MONGO_URI)
+        self._check_index_exists()
+    
+    def _check_index_exists(self):
+        pass
 
     def start_streaming(self, keyword, response):
         pass
