@@ -17,22 +17,14 @@ class BaseClient(abc.ABC):
     def fetch_data(self, keyword, data_file_path):
         pass
 
-    def _compactify(self, record):
-        data = json.dumps(record)
-        result = {
-            key: data[key]
-            for key in data
-            if key in self.config.TWITTER_POST_SCHEMA
-        }
-        return result
-
     def write_to_json(self, data_file_path):
         with open(data_file_path, "a") as fp:
             for data in self.data:
                 try:
-                    fp.write(f"{self._compactify(data)}\n")
+                    output = self._compactify(data)
+                    fp.write(f"{output}\n")
                 except json.decoder.JSONDecodeError:
-                    pass
+                    fp.write("Error processign data")
 
 
 class TwitterClient(BaseClient):
@@ -43,9 +35,25 @@ class TwitterClient(BaseClient):
             self.config.TWITTER_CONSUMER_SECRET,
         )
         self.client = API(auth_wallet)
+    
+    def _compactify(self, record):
+        result = {}
+
+        for key in self.config.TWITTER_POST_SCHEMA:
+            if key in record:
+                result[key] = record[key]
+        
+        return result
 
     def write_to_json(self, data_file_path):
-        super().write_to_json(data_file_path)
+        with open(data_file_path, "a") as fp:
+
+            for data in self.data:
+                try:
+                    output = self._compactify(data)
+                    fp.write(f"{output}\n")
+                except json.decoder.JSONDecodeError:
+                    pass
 
         self.count = 0
         self.data = []

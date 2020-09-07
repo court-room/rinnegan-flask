@@ -11,7 +11,7 @@ class BaseClient(abc.ABC):
         self.config = config_obj
 
     @abc.abstractmethod
-    def fetch_sentiments(self):
+    def fetch_sentiments(self, keyword, data_file_path):
         pass
 
     def load_data(self, data_file_path):
