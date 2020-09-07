@@ -8,7 +8,7 @@ class BaseClient(abc.ABC):
         self.config = config_obj
 
     @abc.abstractmethod
-    def start_streaming(self, keyword, data_file_path):
+    def start_streaming(self, keyword, response):
         pass
 
 
