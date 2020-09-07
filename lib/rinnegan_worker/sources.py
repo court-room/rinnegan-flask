@@ -47,7 +47,7 @@ class TwitterClient(BaseClient):
 
         for tweet in Cursor(
             self.client.search, q=keyword, lang="en", until=until
-        ).items(1):
+        ).items(self.config.TWITTER_POST_LIMITS):
             self.count += 1
 
             # skipcq: PYL-W0212

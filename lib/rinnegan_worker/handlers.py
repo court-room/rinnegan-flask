@@ -4,6 +4,7 @@ import logging
 from lib.rinnegan_worker.factory import NLPModelClientFactory
 from lib.rinnegan_worker.factory import SourceClientFactory
 from lib.rinnegan_worker.factory import StorageVendorClientFactory
+from lib.rinnegan_worker.factory import StreamingClientFactory
 
 
 log_format_string = "%(asctime)s PID- %(process)d %(levelname)s %(pathname)s %(funcName)s %(lineno)d %(message)s"  # noqa: E501
@@ -53,4 +54,8 @@ def start_analysis(params):
 
         print(nlp_response, file=sys.stderr)
 
-    logger.info(f"Analysis for {keyword} completed")
+    streaming_client = StreamingClientFactory.build_client(params["streaming"])
+
+    streaming_client.start_streaming(keyword, local_file_path)
+
+    logger.info(f"Analysis for {params['keyword']} completed")
