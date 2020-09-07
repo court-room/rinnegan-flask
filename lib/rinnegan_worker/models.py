@@ -37,12 +37,13 @@ class MonkeyLearnClient(BaseClient):
 
         # data = {"response": response.body}
         import sys
+
         for data in self.data:
             print(data, file=sys.stderr)
             break
         with open("data-monkeylearn.json", "w") as fp:
             json.dump(self.data, fp)
-        
+
         return response.body
 
 
