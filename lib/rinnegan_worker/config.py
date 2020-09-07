@@ -33,6 +33,7 @@ class TwitterConfig(BaseConfig):
     TWITTER_POST_LIMITS = int(
         BaseConfig.read_secrets(os.getenv("TWITTER_POST_LIMITS_FILE"))
     )
+    TWITTER_POST_SCHEMA = ["text"]
 
 
 class AWSConfig(BaseConfig):

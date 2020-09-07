@@ -11,7 +11,7 @@ class BaseClient(abc.ABC):
         self.config = config_obj
 
     @abc.abstractmethod
-    def fetch_predictions(self):
+    def fetch_sentiments(self):
         pass
 
     def load_data(self, data_file_path):
@@ -25,7 +25,7 @@ class MonkeyLearnClient(BaseClient):
         self.model_id = self.config.MONKEYLEARN_MODEL_ID
         self.client = MonkeyLearn(self.config.MONKEYLEARN_API_TOKEN)
 
-    def fetch_predictions(self, keyword, data_file_path):
+    def fetch_sentiments(self, keyword, data_file_path):
         self.load_data(data_file_path)
 
         # response = self.client.classifiers.classify(
@@ -34,13 +34,7 @@ class MonkeyLearnClient(BaseClient):
         #     auto_batch=True,
         #     retry_if_throttled=True,
         # )
-
         # data = {"response": response.body}
-        import sys
-
-        for data in self.data:
-            print(data, file=sys.stderr)
-            break
         with open("data-monkeylearn.json", "w") as fp:
             json.dump(self.data, fp)
 

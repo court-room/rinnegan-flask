@@ -17,11 +17,16 @@ class BaseClient(abc.ABC):
     def fetch_data(self, keyword, data_file_path):
         pass
 
+    def _compactify(self, record):
+        data = json.dumps(data)
+
+        result = {key: data[key] for key in data if key in self.config.TWITTER_POST_SCHEMA}
+
     def write_to_json(self, data_file_path):
         with open(data_file_path, "a") as fp:
             for data in self.data:
                 try:
-                    fp.write(f"{json.dumps(data)}\n")
+                    fp.write(f"{self._compactify(data)}\n")
                 except json.decoder.JSONDecodeError:
                     pass
 
