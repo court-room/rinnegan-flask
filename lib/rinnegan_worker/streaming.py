@@ -16,7 +16,9 @@ class BaseClient(abc.ABC):
 class MongoDBClient(BaseClient):
     def __init__(self, config_obj):
         super().__init__(config_obj)
-        self.client = MongoClient(self.config.MONGO_URI, authSource=self.config.MONGO_AUTH_SOURCE)
+        self.client = MongoClient(
+            self.config.MONGO_URI, authSource=self.config.MONGO_AUTH_SOURCE
+        )
         self.db = self.client[self.config.MONGO_DATABASE]
         self.collection = self.db[self.config.MONGO_MODEL_COLLECTION]
 
