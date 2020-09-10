@@ -3,9 +3,6 @@ import abc
 from pymongo import MongoClient
 
 
-# import json
-
-
 class BaseClient(abc.ABC):
     def __init__(self, config_obj):
         self.config = config_obj
@@ -19,14 +16,8 @@ class BaseClient(abc.ABC):
 class MongoDBClient(BaseClient):
     def __init__(self, config_obj):
         super().__init__(config_obj)
-        host = self.config.MONGO_HOST
-        port = self.config.MONGO_PORT
-        username = self.config.MONGO_USER
-        password=self.config.MONGO_PASSWORD
-        database = self.config.MONGO_DATABASE
-        connection_string = f"mongodb://{username}:{password}@{host}:{port}"
-        self.client = MongoClient(connection_string)
-        self.db = self.client[database]
+        self.client = MongoClient(self.config.MONGO_URI, authSource=self.config.MONGO_AUTH_SOURCE)
+        self.db = self.client[self.config.MONGO_DATABASE]
         self.collection = self.db[self.config.MONGO_MODEL_COLLECTION]
 
     def start_streaming(self, keyword, responses):

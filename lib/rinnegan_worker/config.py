@@ -56,10 +56,8 @@ class NLPModelConfig(BaseConfig):
 
 
 class MongoDBClient(BaseConfig):
-    MONGO_HOST = BaseConfig.read_secrets(os.getenv("MONGO_HOST_FILE"))
-    MONGO_PORT = int(BaseConfig.read_secrets(os.getenv("MONGO_PORT_FILE")))
-    MONGO_USER = BaseConfig.read_secrets(os.getenv("MONGO_USER_FILE"))
-    MONGO_PASSWORD = BaseConfig.read_secrets(os.getenv("MONGO_PASSWORD_FILE"))
+    MONGO_URI = BaseConfig.read_secrets(os.getenv("MONGO_URI_FILE"))
+    MONGO_AUTH_SOURCE = int(BaseConfig.read_secrets(os.getenv("MONGO_AUTH_SOURCE_FILE")))
     MONGO_DATABASE = BaseConfig.read_secrets(os.getenv("MONGO_DATABASE_FILE"))
     MONGO_MODEL_COLLECTION = BaseConfig.read_secrets(
         os.getenv("MONGO_MODEL_COLLECTION_FILE")
