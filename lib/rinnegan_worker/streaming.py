@@ -9,7 +9,7 @@ class BaseClient(abc.ABC):
         self.data = None
 
     @abc.abstractmethod
-    def start_streaming(self, keyword, response):
+    def start_streaming(self, keyword, responses):
         pass
 
 
