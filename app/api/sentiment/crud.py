@@ -96,3 +96,15 @@ def add_sentiment(keyword, user_id, job_id):
     db.session.commit()
 
     update_user_sentiment_quota(user_id)
+
+
+def get_job_status(job_id):
+    """
+    Returns the job status with given id
+
+    :param: job_id
+        ID of the job
+    :returns:
+        Details with given ID
+    """
+    return True

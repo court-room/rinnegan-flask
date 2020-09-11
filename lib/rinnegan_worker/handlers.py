@@ -44,6 +44,6 @@ def start_analysis(params):
     )
     storage_vendor_client.upload(local_file_path)
     response = model_client.fetch_sentiments(keyword, local_file_path)
-    streaming_client.start_streaming(keyword, response)
+    streaming_client.start_streaming(keyword, response, request_id)
 
     logger.info(f"Analysis for {keyword} completed")
