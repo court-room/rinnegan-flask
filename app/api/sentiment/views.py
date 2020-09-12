@@ -28,7 +28,6 @@ class SentimentList(Resource):
     @staticmethod
     # Use multiple expect blocks in swagger UI
     # @sentiment_namespace.expect(parser)
-    @sentiment_namespace.mar
     @sentiment_namespace.expect(sentiment_schema, validate=True)
     @sentiment_namespace.response(201, "Successfully added the keyword")
     @sentiment_namespace.response(
@@ -69,7 +68,7 @@ class SentimentList(Resource):
             logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
 
             response["message"] = f"{keyword} was added"
-            response["job_id"] = job.get_id()
+            response["request_id"] = job.get_id()
             logger.info(f"Sentiment for {keyword} added successfully")
             return response, 202
 
@@ -114,10 +113,8 @@ class SentimentDetail(Resource):
     @staticmethod
     @sentiment_namespace.expect(parser, validate=True)
     # @sentiment_namespace.marshal_with(sentiment_schema)
-    @sentiment_namespace.response(
-        404, "Job <job_id> does not exist"
-    )
-    def get(sentiment_id):
+    @sentiment_namespace.response(404, "Job <request_id> does not exist")
+    def get(request_id):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
@@ -130,12 +127,12 @@ class SentimentDetail(Resource):
             token = auth_header.split()[1]
             get_user_id_by_token(token)
 
-            sentiment = get_sentiment_by_id(sentiment_id)
+            sentiment = get_sentiment_by_id(request_id)
 
             if not sentiment:
-                logger.info(f"Invalid sentiment_id for token {token}")
+                logger.info(f"Invalid request_id for token {token}")
                 sentiment_namespace.abort(
-                    404, f"Sentiment {sentiment_id} does not exist"
+                    404, f"Sentiment {request_id} does not exist"
                 )
 
             return sentiment, 200
@@ -236,48 +233,5 @@ class SentimentDetail(Resource):
             )
 
 
-class SentimentStatus(Resource):
-    @staticmethod
-    @sentiment_namespace.expect(parser, validate=True)
-    # @sentiment_namespace.marshal_with(sentiment_schema)
-    @sentiment_namespace.response(
-        404, "Job <job_id> does not exist"
-    )
-    def get(job_id):
-        auth_header = request.headers.get("Authorization")
-
-        if not auth_header:
-            logger.info(f"Authorization header not found in {request}")
-            sentiment_namespace.abort(
-                403, "Token required to fetch the status"
-            )
-
-        try:
-            token = auth_header.split()[1]
-            get_user_id_by_token(token)
-
-            status = get_job_status(job_id)
-            print(status)
-
-            if not status:
-                logger.info(f"Invalid job_id for token {token}")
-                sentiment_namespace.abort(
-                    404, f"Job {job_id} does not exist"
-                )
-
-            return status, 200
-        except ExpiredSignatureError:
-            logger.error(f"Auth-token {token} has expired")
-            sentiment_namespace.abort(
-                401, "Token expired. Please log in again."
-            )
-        except InvalidTokenError:
-            logger.error(f"Auth-token {token} is invalid")
-            sentiment_namespace.abort(
-                401, "Invalid token. Please log in again."
-            )
-
-
 sentiment_namespace.add_resource(SentimentList, "")
-sentiment_namespace.add_resource(SentimentDetail, "/<int:sentiment_id>")
-sentiment_namespace.add_resource(SentimentStatus, "/status/<int:job_id>")
+sentiment_namespace.add_resource(SentimentDetail, "/<request_id>")

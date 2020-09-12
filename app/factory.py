@@ -1,6 +1,7 @@
 from flask import abort
 from flask import Flask
 from flask import request
+from pymongo import MongoClient
 from redis import Redis
 from rq import Queue
 
@@ -27,6 +28,11 @@ def create_app(environemnt):
     app.task_queue = Queue(
         app.config.get("REDIS_QUEUE_NAME"), connection=app.redis
     )
+    mongo_client = MongoClient(
+        app.config.get("MONGO_URI"),
+        authSource=app.config.get("MONGO_AUTH_SOURCE"),
+    )
+    app.mongo = mongo_client[app.config.get("MONGO_DATABASE")]
 
     from app import bcrypt
     from app import cors

@@ -1,3 +1,7 @@
+import json
+
+from flask import current_app
+
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
@@ -23,7 +27,8 @@ def get_sentiment_by_id(sentiment_id):
     :returns:
         Sentiment with given ID
     """
-    return Sentiment.query.get(sentiment_id)
+    result = current_app.mongo.keywords.find(json.dumps(dict()))
+    return result
 
 
 def remove_sentiment(sentiment):
@@ -96,15 +101,3 @@ def add_sentiment(keyword, user_id, job_id):
     db.session.commit()
 
     update_user_sentiment_quota(user_id)
-
-
-def get_job_status(job_id):
-    """
-    Returns the job status with given id
-
-    :param: job_id
-        ID of the job
-    :returns:
-        Details with given ID
-    """
-    return True
