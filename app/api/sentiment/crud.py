@@ -1,5 +1,6 @@
-from flask import current_app
 import numpy as np
+
+from flask import current_app
 
 from app import db
 from app.api.sentiment.models import Sentiment
