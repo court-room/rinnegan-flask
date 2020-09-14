@@ -1,5 +1,4 @@
-import json
-
+from bson import json_util
 from flask import current_app
 
 from app import db
@@ -8,7 +7,6 @@ from app.api.users.crud import get_user_by_id
 
 
 def get_all_sentiments():
-
     """
     Returns the list of all sentiments
 
@@ -27,7 +25,16 @@ def get_sentiment_by_id(sentiment_id):
     :returns:
         Sentiment with given ID
     """
-    result = current_app.mongo.keywords.find(json.dumps(dict()))
+    result = []
+    cursor = current_app.mongo.keywords.find({"request_id": sentiment_id})
+
+    for record in list(cursor):
+        del record["_id"]
+        result.append[record]
+
+    import sys
+    print(result, file=sys.stderr)
+    result = json_util.dumps(list(result))
     return result
 
 
@@ -44,8 +51,7 @@ def remove_sentiment(sentiment):
 
 def update_sentiment(sentiment, keyword):
     """
-    celery = Celery(app.name, broker=app.config.get("CELERY_BROKER_URL"))
-
+    Utility method to update a sentiment
     :param: sentiment
         Sentiment to be updated
     :param: keyword
