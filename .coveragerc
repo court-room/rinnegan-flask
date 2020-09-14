@@ -1,8 +1,9 @@
 [run]
 omit = 
-    tests/*
-    migrations/*
     app/tasks/*
+    lib/*
+    migrations/*
+    tests/*
     manage.py
     gunicorn.conf.py
 branch = true

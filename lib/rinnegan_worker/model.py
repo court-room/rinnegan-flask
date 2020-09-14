@@ -67,7 +67,7 @@ class MonkeyLearnClient(BaseClient):
                         "confidence": 0.998,
                     }
                 ],
-            }
+            },
         ]
 
 

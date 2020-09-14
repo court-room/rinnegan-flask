@@ -33,6 +33,7 @@ def get_sentiment_by_id(sentiment_id):
         result.append[record]
 
     import sys
+
     print(result, file=sys.stderr)
     result = json_util.dumps(list(result))
     return result

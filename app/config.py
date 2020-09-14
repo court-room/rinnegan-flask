@@ -61,6 +61,8 @@ class TestingConfig(BaseConfig):
     REDIS_URL = "redis://"
     TWITTER_CONSUMER_KEY = "dummy"
     TWITTER_CONSUMER_SECRET = "dummy"
+    MONGO_URI = read_secrets(os.getenv("MONGO_URI_FILE"))
+    MONGO_AUTH_SOURCE = read_secrets(os.getenv("MONGO_AUTH_SOURCE_FILE"))
 
 
 class ProductionConfig(BaseConfig):
