@@ -1,5 +1,6 @@
 from bson import json_util
 from flask import current_app
+import numpy as np
 
 from app import db
 from app.api.sentiment.models import Sentiment
@@ -25,18 +26,19 @@ def get_sentiment_by_id(sentiment_id):
     :returns:
         Sentiment with given ID
     """
-    result = []
+    sentiments = []
     cursor = current_app.mongo.keywords.find({"request_id": sentiment_id})
 
     for record in list(cursor):
-        del record["_id"]
-        result.append[record]
+        temp = []
+        for i in record["classifications"]:
+            sign = 1 if i["tag_name"] == "Positive" else -1
+            temp.append(sign * i["confidence"])
+        sentiments.extend(temp)
 
-    import sys
-
-    print(result, file=sys.stderr)
-    result = json_util.dumps(list(result))
-    return result
+    arr = np.array(sentiments, dtype=np.float64)
+    result = np.mean(arr)
+    return {"score": result, "sentiment_id": sentiment_id}
 
 
 def remove_sentiment(sentiment):
