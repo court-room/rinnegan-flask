@@ -34,14 +34,15 @@ def add_user(username, email, password):
     return user
 
 
-def get_all_users():
+def get_all_users(page, per_page):
     """
     Returns the list of all users
 
     :returns:
         List of all users
     """
-    return User.query.all()
+    users = User.query.paginate(page, per_page, False)
+    return users
 
 
 def get_user_by_id(user_id):

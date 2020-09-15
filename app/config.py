@@ -44,11 +44,13 @@ class BaseConfig:
     MONGO_MODEL_COLLECTION = read_secrets(
         os.getenv("MONGO_MODEL_COLLECTION_FILE")
     )
+    POSTS_PER_PAGE = 2
 
 
 class DevelopmentConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 4
     JWT_ENCODE_ALGORITHM = "HS384"
+    # POSTS_PER_PAGE = 10
 
 
 class TestingConfig(BaseConfig):
