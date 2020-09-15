@@ -9,7 +9,7 @@ class BaseClient(abc.ABC):
         self.data = None
 
     @abc.abstractmethod
-    def start_streaming(self, keyword, responses):
+    def start_streaming(self, keyword, responses, request_id):
         pass
 
 
@@ -22,12 +22,13 @@ class MongoDBClient(BaseClient):
         self.db = self.client[self.config.MONGO_DATABASE]
         self.collection = self.db[self.config.MONGO_MODEL_COLLECTION]
 
-    def start_streaming(self, keyword, responses):
+    def start_streaming(self, keyword, responses, request_id):
         self.data = []
 
         for response in responses:
             temp = response
             temp["text"] = temp["text"].encode("ascii", "ignore").decode()
+            temp["request_id"] = request_id
             for obj in temp["classifications"]:
                 del obj["tag_id"]
             del temp["external_id"]

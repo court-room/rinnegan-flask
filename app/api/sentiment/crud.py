@@ -1,10 +1,13 @@
+import numpy as np
+
+from flask import current_app
+
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
 
 
 def get_all_sentiments():
-
     """
     Returns the list of all sentiments
 
@@ -23,7 +26,19 @@ def get_sentiment_by_id(sentiment_id):
     :returns:
         Sentiment with given ID
     """
-    return Sentiment.query.get(sentiment_id)
+    sentiments = []
+    cursor = current_app.mongo.keywords.find({"request_id": sentiment_id})
+
+    for record in list(cursor):
+        temp = []
+        for i in record["classifications"]:
+            sign = 1 if i["tag_name"] == "Positive" else -1
+            temp.append(sign * i["confidence"])
+        sentiments.extend(temp)
+
+    arr = np.array(sentiments, dtype=np.float64)
+    result = np.mean(arr)
+    return {"score": result, "sentiment_id": sentiment_id}
 
 
 def remove_sentiment(sentiment):
@@ -39,8 +54,7 @@ def remove_sentiment(sentiment):
 
 def update_sentiment(sentiment, keyword):
     """
-    celery = Celery(app.name, broker=app.config.get("CELERY_BROKER_URL"))
-
+    Utility method to update a sentiment
     :param: sentiment
         Sentiment to be updated
     :param: keyword

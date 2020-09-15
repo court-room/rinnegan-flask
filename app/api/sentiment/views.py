@@ -68,7 +68,7 @@ class SentimentList(Resource):
             logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
 
             response["message"] = f"{keyword} was added"
-            response["job_id"] = job.get_id()
+            response["request_id"] = job.get_id()
             logger.info(f"Sentiment for {keyword} added successfully")
             return response, 202
 
@@ -112,11 +112,9 @@ class SentimentList(Resource):
 class SentimentDetail(Resource):
     @staticmethod
     @sentiment_namespace.expect(parser, validate=True)
-    @sentiment_namespace.marshal_with(sentiment_schema)
-    @sentiment_namespace.response(
-        404, "Sentiment <sentiment_id> does not exist"
-    )
-    def get(sentiment_id):
+    # @sentiment_namespace.marshal_with(sentiment_schema)
+    @sentiment_namespace.response(404, "Job <request_id> does not exist")
+    def get(request_id):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
@@ -129,12 +127,12 @@ class SentimentDetail(Resource):
             token = auth_header.split()[1]
             get_user_id_by_token(token)
 
-            sentiment = get_sentiment_by_id(sentiment_id)
+            sentiment = get_sentiment_by_id(request_id)
 
             if not sentiment:
-                logger.info(f"Invalid sentiment_id for token {token}")
+                logger.info(f"Invalid request_id for token {token}")
                 sentiment_namespace.abort(
-                    404, f"Sentiment {sentiment_id} does not exist"
+                    404, f"Sentiment {request_id} does not exist"
                 )
 
             return sentiment, 200
@@ -236,4 +234,4 @@ class SentimentDetail(Resource):
 
 
 sentiment_namespace.add_resource(SentimentList, "")
-sentiment_namespace.add_resource(SentimentDetail, "/<int:sentiment_id>")
+sentiment_namespace.add_resource(SentimentDetail, "/<request_id>")

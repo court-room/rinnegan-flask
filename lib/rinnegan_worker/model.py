@@ -34,14 +34,41 @@ class MonkeyLearnClient(BaseClient):
     def fetch_sentiments(self, keyword, data_file_path):
         self._load_data(data_file_path)
 
-        response = self.client.classifiers.classify(
-            model_id=self.model_id,
-            data=self.data,
-            auto_batch=True,
-            retry_if_throttled=True,
-        )
+        if self.config.FLASK_ENV == "production":
+            response = self.client.classifiers.classify(
+                model_id=self.model_id,
+                data=self.data,
+                auto_batch=True,
+                retry_if_throttled=True,
+            )
 
-        return response.body
+            return response.body
+        return [
+            {
+                "text": "This is a great tool!",
+                "external_id": None,
+                "error": False,
+                "classifications": [
+                    {
+                        "tag_name": "Positive",
+                        "tag_id": 33767179,
+                        "confidence": 0.998,
+                    }
+                ],
+            },
+            {
+                "text": "This is a great tool!",
+                "external_id": None,
+                "error": False,
+                "classifications": [
+                    {
+                        "tag_name": "Positive",
+                        "tag_id": 33767179,
+                        "confidence": 0.998,
+                    }
+                ],
+            },
+        ]
 
 
 client_map = {"monkeylearn": MonkeyLearnClient}

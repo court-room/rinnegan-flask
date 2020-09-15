@@ -53,6 +53,7 @@ class NLPModelConfig(BaseConfig):
     MONKEYLEARN_MODEL_ID = BaseConfig.read_secrets(
         os.getenv("MONKEYLEARN_MODEL_ID_FILE")
     )
+    FLASK_ENV = os.getenv("FLASK_ENV")
 
 
 class MongoDBClient(BaseConfig):

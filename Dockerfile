@@ -1,6 +1,6 @@
 FROM python:3.8.5 as builder
 
-LABEL maintainer="onlinejudge95<onlinejudge95@gmail.com>"
+LABEL maintainer="onlinejudge95"
 
 WORKDIR /usr/src/app
 
