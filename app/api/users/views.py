@@ -1,5 +1,6 @@
 import logging
 
+from flask import current_app
 from flask import request
 from flask_restx import Resource
 from jwt import ExpiredSignatureError
@@ -11,6 +12,7 @@ from app.api.users.crud import get_all_users
 from app.api.users.crud import get_user_by_id
 from app.api.users.crud import remove_user
 from app.api.users.crud import update_user
+from app.api.users.serializers import parser as user_parser
 from app.api.users.serializers import user_readable
 from app.api.users.serializers import users_namespace
 
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class UsersList(Resource):
     @staticmethod
-    @users_namespace.expect(parser, validate=True)
+    @users_namespace.expect(user_parser, validate=True)
     @users_namespace.marshal_with(user_readable, as_list=True)
     def get():
         auth_header = request.headers.get("Authorization")
@@ -34,7 +36,12 @@ class UsersList(Resource):
 
             get_user_id_by_token(token)
 
-            return get_all_users(), 200
+            args = user_parser.parse_args()
+            page = int(args.get("page", 1))
+            per_page = current_app.config.get("POSTS_PER_PAGE")
+
+            users = get_all_users(page, per_page)
+            return users.items, 200
         except ExpiredSignatureError:
             logger.error(f"Auth-token {token} has expired")
             users_namespace.abort(401, "Token expired. Please log in again.")

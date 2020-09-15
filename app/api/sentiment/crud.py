@@ -7,14 +7,19 @@ from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
 
 
-def get_all_sentiments():
+def get_all_sentiments(page, per_page):
     """
     Returns the list of all sentiments
 
+    :params: page
+        Page no. to fetch data from
+    :params: per_page
+        No. of items in a page
     :returns:
         List of all sentiments
     """
-    return Sentiment.query.all()
+    sentiments = Sentiment.query.paginate(page, per_page, False)
+    return sentiments
 
 
 def get_sentiment_by_id(sentiment_id):

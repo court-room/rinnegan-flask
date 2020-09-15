@@ -9,12 +9,14 @@ from jwt import InvalidTokenError
 
 from app.api.auth.crud import get_user_id_by_token
 from app.api.auth.serializers import parser
+from app.api.auth.serializers import sentiment_score_schema
 from app.api.sentiment.crud import add_sentiment
 from app.api.sentiment.crud import get_all_sentiments
 from app.api.sentiment.crud import get_sentiment_by_id
 from app.api.sentiment.crud import is_user_sentiment_quota_exhausted
 from app.api.sentiment.crud import remove_sentiment
 from app.api.sentiment.crud import update_sentiment
+from app.api.sentiment.serializers import parser as sentiment_parser
 from app.api.sentiment.serializers import sentiment_namespace
 from app.api.sentiment.serializers import sentiment_schema
 from app.api.sentiment.serializers import update_sentiment_schema
@@ -80,7 +82,7 @@ class SentimentList(Resource):
         return response, 403
 
     @staticmethod
-    @sentiment_namespace.expect(parser, validate=True)
+    @sentiment_namespace.expect(sentiment_parser, validate=True)
     @sentiment_namespace.marshal_with(sentiment_schema, as_list=True)
     def get():
         auth_header = request.headers.get("Authorization")
@@ -94,7 +96,14 @@ class SentimentList(Resource):
         try:
             token = auth_header.split()[1]
             get_user_id_by_token(token)
-            return get_all_sentiments(), 200
+
+            args = sentiment_parser.parse_args()
+            page = int(args.get("page", 1))
+            per_page = current_app.config.get("POSTS_PER_PAGE")
+
+            sentiments = get_all_sentiments(page, per_page)
+
+            return sentiments.items, 200
         except ExpiredSignatureError:
             logger.error(f"Auth-token {token} has expired")
             sentiment_namespace.abort(
@@ -110,7 +119,7 @@ class SentimentList(Resource):
 class SentimentDetail(Resource):
     @staticmethod
     @sentiment_namespace.expect(parser, validate=True)
-    # @sentiment_namespace.marshal_with(sentiment_schema)
+    @sentiment_namespace.marshal_with(sentiment_score_schema)
     @sentiment_namespace.response(404, "Job <request_id> does not exist")
     def get(request_id):
         auth_header = request.headers.get("Authorization")
