@@ -38,6 +38,10 @@ def get_all_users(page, per_page):
     """
     Returns the list of all users
 
+    :params: page
+        Page no. to fetch data from
+    :params: per_page
+        No. of items in a page
     :returns:
         List of all users
     """
