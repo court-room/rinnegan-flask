@@ -9,7 +9,7 @@ sentiment_namespace = Namespace("sentiment")
 sentiment_schema = sentiment_namespace.model(
     "Sentiment",
     {
-        "job_id": fields.Integer(readOnly=True),
+        "job_id": fields.String(readOnly=True),
         "user_id": fields.Integer(required=True),
         "keyword": fields.String(required=True),
     },
