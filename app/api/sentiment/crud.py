@@ -94,7 +94,7 @@ def update_user_sentiment_quota(user_id):
     db.session.commit()
 
 
-def add_sentiment(keyword, user_id, job_id):
+def add_sentiment(keyword, user_id, request_id):
     """
     Adds a sentiment with given details and returns an instance of it.
 
@@ -102,10 +102,12 @@ def add_sentiment(keyword, user_id, job_id):
         keyword to find sentiment for
     :param: user_id
         Id of the user
+    :param request_id:
+        Id of the request for sentiment
     :returns:
         Sentiment with given details
     """
-    sentiment = Sentiment(keyword=keyword, user_id=user_id, job_id=job_id)
+    sentiment = Sentiment(keyword=keyword, user_id=user_id, job_id=request_id)
     db.session.add(sentiment)
     db.session.commit()
 

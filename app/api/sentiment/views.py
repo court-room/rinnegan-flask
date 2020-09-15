@@ -62,13 +62,11 @@ class SentimentList(Resource):
                 job_timeout="5h",
             )
 
-            add_sentiment(keyword, user_id, job.get_id())
-
-            logging.info(f"Job ID for analysing {keyword} is {job.get_id()}")
+            add_sentiment(keyword, user_id, request_id)
             logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
 
             response["message"] = f"{keyword} was added"
-            response["request_id"] = job.get_id()
+            response["request_id"] = request_id
             logger.info(f"Sentiment for {keyword} added successfully")
             return response, 202
 
