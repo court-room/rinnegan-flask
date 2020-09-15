@@ -9,6 +9,7 @@ from jwt import InvalidTokenError
 
 from app.api.auth.crud import get_user_id_by_token
 from app.api.auth.serializers import parser
+from app.api.auth.serializers import sentiment_score_schema
 from app.api.sentiment.crud import add_sentiment
 from app.api.sentiment.crud import get_all_sentiments
 from app.api.sentiment.crud import get_sentiment_by_id
