@@ -7,7 +7,7 @@ if [ $NODE_TYPE == "server" ]; then
     
     if [ $FLASK_ENV != "development" ]; then
         echo "Running Gunicorn with eventlet workers"
-        gunicorn --config /usr/src/app/gunicorn.conf.py manage:app
+        gunicorn --bind 0.0.0.0:5000 manage:app
     else
         echo "Running the single threaded flask server"
         flask run --host 0.0.0.0
