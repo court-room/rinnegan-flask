@@ -10,7 +10,7 @@ if [ $NODE_TYPE == "server" ]; then
         gunicorn --bind 0.0.0.0:5000 manage:app
     else
         echo "Running the single threaded flask server"
-        flask run --host 0.0.0.0
+        gunicorn --bind 0.0.0.0:5000 manage:app
     fi
 else
     mkdir -p /usr/src/app/data/worker-data
