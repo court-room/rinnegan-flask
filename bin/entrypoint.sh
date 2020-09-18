@@ -7,9 +7,9 @@ if [ $NODE_TYPE == "server" ]; then
     
     if [ $FLASK_ENV != "development" ]; then
         echo "Running Gunicorn with eventlet workers"
-        gunicorn --bind 0.0.0.0:5000 manage:app
+        gunicorn --bind 0.0.0.0:5000 --worker-class eventlet manage:app
     else
-        echo "Running the single threaded flask server"
+        echo "Running Gunicorn with sync workers"
         gunicorn --bind 0.0.0.0:5000 manage:app
     fi
 else
