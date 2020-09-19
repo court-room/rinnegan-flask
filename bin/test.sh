@@ -19,4 +19,4 @@ pipenv run isort \
 --skip-glob "migrations/*" \
 .
 
-pipenv run pytest -c tests/pytest.ini
+# pipenv run pytest -c tests/pytest.ini

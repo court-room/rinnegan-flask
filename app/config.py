@@ -38,11 +38,19 @@ class BaseConfig:
     CLOUD_VENDOR = read_secrets(os.getenv("CLOUD_VENDOR"))
     AWS_ACCESS_KEY_ID = read_secrets(os.getenv("AWS_ACCESS_KEY_ID"))
     AWS_SECRET_ACCESS_KEY = read_secrets(os.getenv("AWS_SECRET_ACCESS_KEY"))
+    MONGO_URI = read_secrets(os.getenv("MONGO_URI_FILE"))
+    MONGO_AUTH_SOURCE = read_secrets(os.getenv("MONGO_AUTH_SOURCE_FILE"))
+    MONGO_DATABASE = read_secrets(os.getenv("MONGO_DATABASE_FILE"))
+    MONGO_MODEL_COLLECTION = read_secrets(
+        os.getenv("MONGO_MODEL_COLLECTION_FILE")
+    )
+    POSTS_PER_PAGE = 10
 
 
 class DevelopmentConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 4
     JWT_ENCODE_ALGORITHM = "HS384"
+    POSTS_PER_PAGE = 2
 
 
 class TestingConfig(BaseConfig):
@@ -55,6 +63,8 @@ class TestingConfig(BaseConfig):
     REDIS_URL = "redis://"
     TWITTER_CONSUMER_KEY = "dummy"
     TWITTER_CONSUMER_SECRET = "dummy"
+    MONGO_URI = read_secrets(os.getenv("MONGO_URI_FILE"))
+    MONGO_AUTH_SOURCE = read_secrets(os.getenv("MONGO_AUTH_SOURCE_FILE"))
 
 
 class ProductionConfig(BaseConfig):

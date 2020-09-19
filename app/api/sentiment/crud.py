@@ -1,17 +1,25 @@
+import numpy as np
+
+from flask import current_app
+
 from app import db
 from app.api.sentiment.models import Sentiment
 from app.api.users.crud import get_user_by_id
 
 
-def get_all_sentiments():
-
+def get_all_sentiments(page, per_page):
     """
     Returns the list of all sentiments
 
+    :params: page
+        Page no. to fetch data from
+    :params: per_page
+        No. of items in a page
     :returns:
         List of all sentiments
     """
-    return Sentiment.query.all()
+    sentiments = Sentiment.query.paginate(page, per_page, False)
+    return sentiments
 
 
 def get_sentiment_by_id(sentiment_id):
@@ -23,7 +31,19 @@ def get_sentiment_by_id(sentiment_id):
     :returns:
         Sentiment with given ID
     """
-    return Sentiment.query.get(sentiment_id)
+    sentiments = []
+    cursor = current_app.mongo.keywords.find({"request_id": sentiment_id})
+
+    for record in list(cursor):
+        temp = []
+        for i in record["classifications"]:
+            sign = 1 if i["tag_name"] == "Positive" else -1
+            temp.append(sign * i["confidence"])
+        sentiments.extend(temp)
+
+    arr = np.array(sentiments, dtype=np.float64)
+    result = np.mean(arr)
+    return {"score": result, "sentiment_id": sentiment_id}
 
 
 def remove_sentiment(sentiment):
@@ -39,8 +59,7 @@ def remove_sentiment(sentiment):
 
 def update_sentiment(sentiment, keyword):
     """
-    celery = Celery(app.name, broker=app.config.get("CELERY_BROKER_URL"))
-
+    Utility method to update a sentiment
     :param: sentiment
         Sentiment to be updated
     :param: keyword
@@ -80,7 +99,7 @@ def update_user_sentiment_quota(user_id):
     db.session.commit()
 
 
-def add_sentiment(keyword, user_id, job_id):
+def add_sentiment(keyword, user_id, request_id):
     """
     Adds a sentiment with given details and returns an instance of it.
 
@@ -88,10 +107,12 @@ def add_sentiment(keyword, user_id, job_id):
         keyword to find sentiment for
     :param: user_id
         Id of the user
+    :param request_id:
+        Id of the request for sentiment
     :returns:
         Sentiment with given details
     """
-    sentiment = Sentiment(keyword=keyword, user_id=user_id, job_id=job_id)
+    sentiment = Sentiment(keyword=keyword, user_id=user_id, job_id=request_id)
     db.session.add(sentiment)
     db.session.commit()
 

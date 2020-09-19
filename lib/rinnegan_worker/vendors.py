@@ -29,9 +29,4 @@ class AWSS3Client(BaseClient):
         )
 
 
-class AzureObjectStorageClient(BaseClient):
-    def upload(self, local_file_path):
-        pass
-
-
-client_map = {"aws": AWSS3Client, "azure": AzureObjectStorageClient}
+client_map = {"aws": AWSS3Client}

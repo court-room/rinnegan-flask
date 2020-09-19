@@ -19,7 +19,12 @@ class BaseClient(abc.ABC):
 
     def write_to_json(self, data_file_path):
         with open(data_file_path, "a") as fp:
-            json.dump(self.data, fp)
+            for data in self.data:
+                try:
+                    output = self._compactify(data)
+                    fp.write(f"{output}\n")
+                except json.decoder.JSONDecodeError:
+                    fp.write("Error processign data")
 
 
 class TwitterClient(BaseClient):
@@ -31,8 +36,24 @@ class TwitterClient(BaseClient):
         )
         self.client = API(auth_wallet)
 
+    def _compactify(self, record):
+        result = {}
+
+        for key in self.config.TWITTER_POST_SCHEMA:
+            if key in record:
+                result[key] = record[key]
+
+        return result
+
     def write_to_json(self, data_file_path):
-        super().write_to_json(data_file_path)
+        with open(data_file_path, "a") as fp:
+
+            for data in self.data:
+                try:
+                    output = self._compactify(data)
+                    fp.write(f"{output}\n")
+                except json.decoder.JSONDecodeError:
+                    pass
 
         self.count = 0
         self.data = []
@@ -43,7 +64,7 @@ class TwitterClient(BaseClient):
 
         for tweet in Cursor(
             self.client.search, q=keyword, lang="en", until=until
-        ).items(1000):
+        ).items(self.config.TWITTER_POST_LIMITS):
             self.count += 1
 
             # skipcq: PYL-W0212
@@ -55,9 +76,4 @@ class TwitterClient(BaseClient):
         self.write_to_json(data_file_path)
 
 
-class FacebookClient(BaseClient):
-    def fetch_data(self, keyword, data_file_path):
-        pass
-
-
-client_map = {"twitter": TwitterClient, "facebook": FacebookClient}
+client_map = {"twitter": TwitterClient}

@@ -15,8 +15,10 @@ from app.api.sentiment.crud import get_sentiment_by_id
 from app.api.sentiment.crud import is_user_sentiment_quota_exhausted
 from app.api.sentiment.crud import remove_sentiment
 from app.api.sentiment.crud import update_sentiment
+from app.api.sentiment.serializers import parser as sentiment_parser
 from app.api.sentiment.serializers import sentiment_namespace
 from app.api.sentiment.serializers import sentiment_schema
+from app.api.sentiment.serializers import sentiment_score_schema
 from app.api.sentiment.serializers import update_sentiment_schema
 from app.api.users.crud import get_user_by_id
 
@@ -49,10 +51,11 @@ class SentimentList(Resource):
             request_id = uuid.uuid4().hex
 
             params = {
-                "keyword": keyword,
-                "request_id": request_id,
-                "source": "twitter",
-                "vendor": "aws",
+                "keyword": {"data": keyword},
+                "meta": {"request_id": request_id, "model": "monkeylearn"},
+                "source": {"data": "twitter"},
+                "object_storage_vendor": {"data": "aws"},
+                "streaming": {"data": "mongo"},
             }
 
             job = current_app.task_queue.enqueue(
@@ -61,13 +64,11 @@ class SentimentList(Resource):
                 job_timeout="5h",
             )
 
-            add_sentiment(keyword, user_id, job.get_id())
-
-            logging.info(f"Job ID for analysing {keyword} is {job.get_id()}")
+            add_sentiment(keyword, user_id, request_id)
             logging.info(f"RequestID for Job - {job.get_id()} is {request_id}")
 
             response["message"] = f"{keyword} was added"
-            response["job_id"] = job.get_id()
+            response["request_id"] = request_id
             logger.info(f"Sentiment for {keyword} added successfully")
             return response, 202
 
@@ -81,7 +82,7 @@ class SentimentList(Resource):
         return response, 403
 
     @staticmethod
-    @sentiment_namespace.expect(parser, validate=True)
+    @sentiment_namespace.expect(sentiment_parser, validate=True)
     @sentiment_namespace.marshal_with(sentiment_schema, as_list=True)
     def get():
         auth_header = request.headers.get("Authorization")
@@ -95,7 +96,14 @@ class SentimentList(Resource):
         try:
             token = auth_header.split()[1]
             get_user_id_by_token(token)
-            return get_all_sentiments(), 200
+
+            args = sentiment_parser.parse_args()
+            page = int(args.get("page", 1))
+            per_page = current_app.config.get("POSTS_PER_PAGE")
+
+            sentiments = get_all_sentiments(page, per_page)
+
+            return sentiments.items, 200
         except ExpiredSignatureError:
             logger.error(f"Auth-token {token} has expired")
             sentiment_namespace.abort(
@@ -111,11 +119,9 @@ class SentimentList(Resource):
 class SentimentDetail(Resource):
     @staticmethod
     @sentiment_namespace.expect(parser, validate=True)
-    @sentiment_namespace.marshal_with(sentiment_schema)
-    @sentiment_namespace.response(
-        404, "Sentiment <sentiment_id> does not exist"
-    )
-    def get(sentiment_id):
+    @sentiment_namespace.marshal_with(sentiment_score_schema)
+    @sentiment_namespace.response(404, "Job <request_id> does not exist")
+    def get(request_id):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
@@ -128,12 +134,12 @@ class SentimentDetail(Resource):
             token = auth_header.split()[1]
             get_user_id_by_token(token)
 
-            sentiment = get_sentiment_by_id(sentiment_id)
+            sentiment = get_sentiment_by_id(request_id)
 
             if not sentiment:
-                logger.info(f"Invalid sentiment_id for token {token}")
+                logger.info(f"Invalid request_id for token {token}")
                 sentiment_namespace.abort(
-                    404, f"Sentiment {sentiment_id} does not exist"
+                    404, f"Sentiment {request_id} does not exist"
                 )
 
             return sentiment, 200
@@ -235,4 +241,4 @@ class SentimentDetail(Resource):
 
 
 sentiment_namespace.add_resource(SentimentList, "")
-sentiment_namespace.add_resource(SentimentDetail, "/<int:sentiment_id>")
+sentiment_namespace.add_resource(SentimentDetail, "/<request_id>")
