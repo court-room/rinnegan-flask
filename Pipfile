@@ -28,6 +28,7 @@ boto3 = "==1.14.56"
 monkeylearn = "==3.5.2"
 pymongo = "==3.11.0"
 numpy = "==1.19.2"
+newrelic = "==5.18.0.148"
 
 [requires]
 python_version = "3.8"
