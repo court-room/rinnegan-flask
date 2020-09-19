@@ -9,7 +9,7 @@ if [ $NODE_TYPE == "server" ]; then
         # echo "Running Gunicorn with eventlet workers"
         # gunicorn --bind 0.0.0.0:5000 --worker-class eventlet manage:app
         echo "Running Flask single threaded worker"
-        flask run --host "0.0.0.0" --port 5000
+        newrelic-admin run-program flask run --host "0.0.0.0" --port 5000
     else
         echo "Running Flask single threaded worker"
         # gunicorn --bind 0.0.0.0:5000 manage:app
