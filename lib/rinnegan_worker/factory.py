@@ -16,7 +16,7 @@ class BaseFactory(abc.ABC):
 class SourceClientFactory(BaseFactory):
     @staticmethod
     def build_client(client_type):
-        client = source_client_map.get(client_type, None)
+        client = source_client_map.get(client_type)
         if not client:
             error = f"""
             Following source:- {client_type} is not integrated with rinnegan
@@ -29,7 +29,7 @@ class SourceClientFactory(BaseFactory):
 class StorageVendorClientFactory(BaseFactory):
     @staticmethod
     def build_client(client_type):
-        client = vendor_client_map.get(client_type, None)
+        client = vendor_client_map.get(client_type)
         if not client:
             error = f"""
             Following vendor:- {client_type} is not integrated with rinnegan
@@ -42,7 +42,7 @@ class StorageVendorClientFactory(BaseFactory):
 class NLPModelClientFactory(BaseFactory):
     @staticmethod
     def build_client(client_type):
-        client = model_client_map.get(client_type, None)
+        client = model_client_map.get(client_type)
         if not client:
             error = f"""
             Following vendor:- {client_type} is not integrated with rinnegan
@@ -55,7 +55,7 @@ class NLPModelClientFactory(BaseFactory):
 class StreamingClientFactory(BaseFactory):
     @staticmethod
     def build_client(client_type):
-        client = streaming_client_map.get(client_type, None)
+        client = streaming_client_map.get(client_type)
         if not client:
             error = f"""
             Following stream:- {client_type} is not integrated with rinnegan
