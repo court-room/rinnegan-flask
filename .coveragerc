@@ -5,5 +5,4 @@ omit =
     migrations/*
     tests/*
     manage.py
-    gunicorn.conf.py
 branch = true
