@@ -17,7 +17,7 @@ FROM python:3.8.5-slim-buster
 WORKDIR /usr/src/app
 
 RUN apt-get update \
-    && apt-get install libpq-dev=11.7-0+deb10u1 libpq5=11.7-0+deb10u1 -y \
+    && apt-get install libpq-dev=11.7-0+deb10u1 libpq5=11.7-0+deb10u1 wget -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
