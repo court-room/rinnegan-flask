@@ -1,4 +1,4 @@
-FROM python:3.8.5 as builder
+FROM python:3.8.6 as builder
 
 LABEL maintainer="onlinejudge95"
 
@@ -12,7 +12,7 @@ RUN pip install pipenv==2018.11.26 \
 
 ##############################################################################
 
-FROM python:3.8.5-slim-buster
+FROM python:3.8.6
 
 WORKDIR /usr/src/app
 
