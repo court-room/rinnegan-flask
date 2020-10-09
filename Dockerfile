@@ -1,4 +1,4 @@
-FROM python:3.8.5 as builder
+FROM python:3.9.0 as builder
 
 LABEL maintainer="onlinejudge95"
 
@@ -12,12 +12,12 @@ RUN pip install pipenv==2018.11.26 \
 
 ##############################################################################
 
-FROM python:3.8.5-slim-buster
+FROM python:3.9.0
 
 WORKDIR /usr/src/app
 
 RUN apt-get update \
-    && apt-get install libpq-dev=11.7-0+deb10u1 -y \
+    && apt-get install libpq-dev=11.7-0+deb10u1 libpq5=11.7-0+deb10u1 -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
