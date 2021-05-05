@@ -1,4 +1,4 @@
-FROM python:3.9.0 as builder
+FROM python:3.9.5 as builder
 
 LABEL maintainer="onlinejudge95"
 
@@ -12,7 +12,7 @@ RUN pip install pipenv==2018.11.26 \
 
 ##############################################################################
 
-FROM python:3.9.0
+FROM python:3.9.5
 
 WORKDIR /usr/src/app
 
